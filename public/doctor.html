@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Doctor Panel - Queue Monitor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <h1>Doctor Panel</h1>
+
+    <label>Select Clinic</label>
+    <select id="clinicSelect">
+      <option value="">Select Clinic</option>
+      <option value="Dermatology">Dermatology</option>
+      <option value="Orthopedics">Orthopedics</option>
+      <option value="Cardiology">Cardiology</option>
+      <option value="ENT">ENT</option>
+    </select>
+
+    <h3>Current Patient</h3>
+    <div id="currentPatient" class="current">None</div>
+
+    <button id="nextBtn">Call Next Patient</button>
+
+    <h3>Queue</h3>
+    <ul id="queueList"></ul>
+
+    <h3>Estimated Waiting Time</h3>
+    <div id="eta">—</div>
+  </div>
+
+<script type="module">
+import { db, AVG_TIME } from "./app.js";
+
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  query,
+  orderBy,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+const clinicSelect = document.getElementById("clinicSelect");
+const queueList = document.getElementById("queueList");
+const currentBox = document.getElementById("currentPatient");
+const etaBox = document.getElementById("eta");
+const nextBtn = document.getElementById("nextBtn");
+
+let queueRef = null;
+let unsubscribe = null;
+let currentPatient = null;
+
+/* 🔁 Load queue */
+clinicSelect.onchange = () => {
+  if (unsubscribe) unsubscribe();
+
+  const clinic = clinicSelect.value;
+  if (!clinic) return;
+
+  queueRef = collection(db, "queue", clinic, "patients");
+  const q = query(queueRef, orderBy("time", "asc"));
+
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    queueList.innerHTML = "";
+    let count = 0;
+
+    snapshot.forEach((docSnap) => {
+      const d = docSnap.data();
+
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <strong>Token ${d.token}</strong><br>
+        Name: ${d.name || "N/A"}<br>
+        Phone: ${d.phone || "N/A"}<br>
+        Email: ${d.email || "N/A"}<br>
+        DOB: ${d.dob || "N/A"}
+      `;
+      queueList.appendChild(li);
+      count++;
+    });
+
+    etaBox.textContent =
+      count > 0 ? `${count * AVG_TIME} minutes` : "No waiting";
+  });
+};
+
+/* ▶️ Call next patient */
+nextBtn.onclick = async () => {
+  if (!queueRef) {
+    alert("Select a clinic first");
+    return;
+  }
+
+  const q = query(queueRef, orderBy("time", "asc"));
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    currentBox.textContent = "None";
+    return;
+  }
+
+  const first = snap.docs[0];
+  currentPatient = first.data();
+
+  currentBox.innerHTML = `
+    <strong>Token ${currentPatient.token}</strong><br>
+    Name: ${currentPatient.name || "N/A"}<br>
+    Phone: ${currentPatient.phone || "N/A"}
+  `;
+
+  await deleteDoc(first.ref);
+};
+</script>
+
+</body>
+</html>

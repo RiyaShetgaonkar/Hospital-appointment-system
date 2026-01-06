@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Signup</title>
+  <style>
+    body {
+      background-color: #f0f8ff; /* Alice blue for a light blue background */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #003366; /* Dark blue for text */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: #ffffff; /* White background for container */
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15); /* Subtle shadow with blue tint */
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      border: 1px solid #e0e0e0; /* Light border for professionalism */
+    }
+    h2 {
+      color: #003366; /* Dark blue for heading */
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    input {
+      border: 2px solid #b0c4de; /* Light steel blue border */
+      padding: 12px;
+      margin: 10px 0;
+      width: 100%;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: border-color 0.3s ease; /* Smooth transition for focus */
+    }
+    input:focus {
+      border-color: #4682b4; /* Steel blue on focus */
+      outline: none;
+    }
+    button {
+      background-color: #4682b4; /* Steel blue for button */
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      transition: background-color 0.3s ease; /* Smooth hover transition */
+    }
+    button:hover {
+      background-color: #003366; /* Darker blue on hover */
+    }
+    p {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    a {
+      color: #4682b4; /* Blue link */
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Signup</h2>
+
+  <form id="signupForm">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+    <button type="submit">Signup</button>
+  </form>
+
+  <p>
+    Already have an account?
+    <a href="login.html">Login</a>
+  </p>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
+    authDomain: "hospital-system-88ee9.firebaseapp.com",
+    projectId: "hospital-system-88ee9",
+    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  document.getElementById("signupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Get Firebase ID token
+      const idToken = await user.getIdToken();
+
+      // Send token to backend
+      const res = await fetch("http://localhost:5000/api/auth/init-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+      alert(data.message);
+
+      // Redirect to form page
+      window.location.href = "form.html";
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+</script>
+
+
+</body>
+</html>

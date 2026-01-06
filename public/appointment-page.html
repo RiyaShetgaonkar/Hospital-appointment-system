@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Take Appointment</h1>
+
+    <p><strong>Patient:</strong> <span id="patientName">Loading...</span></p>
+
+    <label>Select Clinic</label>
+    <select id="clinic">
+      <option value="">Select Clinic</option>
+      <option value="Dermatology">Dermatology</option>
+      <option value="Orthopedics">Orthopedics</option>
+      <option value="Cardiology">Cardiology</option>
+      <option value="ENT">ENT</option>
+    </select>
+
+    <button id="submit">Get Token</button>
+
+    <h3>Your Token</h3>
+    <div id="tokenBox">—</div>
+  </div>
+
+<script type="module">
+import { db } from "./app.js";
+
+import {
+  collection,
+  addDoc,
+  getDocs,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+const auth = getAuth();
+
+const clinicSelect = document.getElementById("clinic");
+const submitBtn = document.getElementById("submit");
+const tokenBox = document.getElementById("tokenBox");
+const patientNameUI = document.getElementById("patientName");
+
+let firebaseUser = null;
+let userData = null;
+
+/* 🔐 Get logged-in user + profile data */
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  firebaseUser = user;
+
+  const token = await user.getIdToken();
+
+  const response = await fetch("/api/auth/profile-data", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  userData = await response.json();
+
+  patientNameUI.textContent = userData.name || "Unknown";
+});
+
+/* 📝 Book appointment */
+submitBtn.onclick = async () => {
+  if (!firebaseUser || !userData) {
+    alert("User data not loaded");
+    return;
+  }
+
+  const clinic = clinicSelect.value;
+  if (!clinic) {
+    alert("Select clinic");
+    return;
+  }
+
+  const snap = await getDocs(
+    collection(db, "queue", clinic, "patients")
+  );
+
+  const tokenNumber = snap.size + 1;
+
+  await addDoc(
+    collection(db, "queue", clinic, "patients"),
+    {
+      uid: firebaseUser.uid,
+      name: userData.name || "N/A",
+      phone: userData.phone || "N/A",
+      email: firebaseUser.email || "N/A",
+      dob: userData.dob || "N/A",
+      token: tokenNumber,
+      time: serverTimestamp()
+    }
+  );
+
+  tokenBox.textContent = tokenNumber;
+};
+</script>
+
+</body>
+</html>

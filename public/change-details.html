@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Change My Details</title>
+  <style>
+    body {
+      background-color: #f0f8ff; /* Alice blue for a light blue background */
+      font-family: 'Segoe UI', sans-serif;
+      color: #003366; /* Dark blue for text */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background-color: #ffffff; /* White background for container */
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15); /* Subtle shadow with blue tint */
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      border: 1px solid #e0e0e0; /* Light border for professionalism */
+    }
+    h2 {
+      color: #003366; /* Dark blue for heading */
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    label {
+      display: block;
+      text-align: left;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #003366; /* Dark blue for labels */
+    }
+    input, select {
+      border: 2px solid #b0c4de; /* Light steel blue border */
+      padding: 12px;
+      margin: 5px 0 15px 0;
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: border-color 0.3s ease; /* Smooth transition for focus */
+    }
+    input:focus, select:focus {
+      border-color: #4682b4; /* Steel blue on focus */
+      outline: none;
+    }
+    
+    /* Style for the locked email field */
+    input[readonly] {
+      background-color: #f9f9f9; /* Slightly off-white */
+      cursor: not-allowed;
+      border-color: #e0e0e0; /* Lighter border */
+      color: #666; /* Gray text */
+    }
+    
+    button {
+      background-color: #4682b4; /* Steel blue for button */
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      font-weight: 500;
+      transition: background-color 0.3s ease; /* Smooth hover transition */
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #003366; /* Darker blue on hover */
+    }
+    .back-link {
+      display: block;
+      margin-top: 15px;
+      color: #4682b4; /* Blue link */
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Update Details</h2>
+  <form id="updateForm">
+    <label>Email Address (Cannot be changed)</label>
+    <input type="email" id="email" readonly>
+
+    <label>Full Name</label>
+    <input type="text" id="name" required>
+
+    <label>Gender</label>
+    <select id="gender" required>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <label>Date of Birth</label>
+    <input type="date" id="dob" required>
+
+    <label>Phone Number</label>
+    <input type="text" id="phone" required>
+
+    <label>Taluka</label>
+    <select id="location" required>
+      <option value="Pernem">Pernem</option>
+      <option value="Bardez">Bardez</option>
+      <option value="Bicholim">Bicholim</option>
+      <option value="Sattari">Sattari</option>
+      <option value="Tiswadi">Tiswadi</option>
+      <option value="Ponda">Ponda</option>
+      <option value="Mormugao">Mormugao</option>
+      <option value="Salcette">Salcette</option>
+      <option value="Dharbandora">Dharbandora</option>
+      <option value="Sanguem">Sanguem</option>
+      <option value="Quepem">Quepem</option>
+      <option value="Canacona">Canacona</option>
+    </select>
+
+    <button type="submit">Update Details</button>
+  </form>
+  <a href="dashboard.html" class="back-link">Back to Dashboard</a>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
+    authDomain: "hospital-system-88ee9.firebaseapp.com",
+    projectId: "hospital-system-88ee9",
+    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    // Pre-fill the email from Auth immediately
+    document.getElementById("email").value = user.email;
+
+    // Pre-fill the rest from Firestore
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch("/api/auth/profile-data", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        document.getElementById("name").value = data.name || "";
+        document.getElementById("gender").value = data.gender || "Male";
+        document.getElementById("dob").value = data.dob || "";
+        document.getElementById("phone").value = data.phone || "";
+        document.getElementById("location").value = data.taluka || "Tiswadi";
+      }
+    } catch (err) { console.error("Error loading data:", err); }
+  });
+
+  document.getElementById("updateForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    const token = await user.getIdToken();
+
+    // Note: We don't even include the email in this object so the backend never receives it to update
+    const updatedData = {
+      name: document.getElementById("name").value,
+      gender: document.getElementById("gender").value,
+      dob: document.getElementById("dob").value,
+      phone: document.getElementById("phone").value,
+      taluka: document.getElementById("location").value
+    };
+
+    try {
+      const response = await fetch("/api/auth/profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedData)
+      });
+
+      if (response.ok) {
+        alert("Details updated successfully!");
+        window.location.href = "viewdetails.html";
+      } else {
+        alert("Update failed.");
+      }
+    } catch (err) { console.error(err); }
+  });
+</script>
+</body>
+</html>

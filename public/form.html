@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Details Form</title>
+  <style>
+    body {
+      background-color: #f0f8ff; /* Alice blue for a light blue background */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #003366; /* Dark blue for text */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: #ffffff; /* White background for container */
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15); /* Subtle shadow with blue tint */
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      border: 1px solid #e0e0e0; /* Light border for professionalism */
+    }
+    h2 {
+      color: #003366; /* Dark blue for heading */
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    input[type="text"], input[type="date"], select {
+      border: 2px solid #b0c4de; /* Light steel blue border */
+      padding: 12px;
+      margin: 10px 0;
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 5px;
+      background-color: white;
+      font-size: 16px;
+      transition: border-color 0.3s ease; /* Smooth transition for focus */
+    }
+    input[type="text"]:focus, input[type="date"]:focus, select:focus {
+      outline: none;
+      border-color: #4682b4; /* Steel blue on focus */
+      box-shadow: 0 0 5px rgba(70, 130, 180, 0.5); /* Subtle blue glow */
+    }
+    select {
+      cursor: pointer;
+    }
+    button {
+      background-color: #4682b4; /* Steel blue for button */
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 10px;
+      font-weight: 500;
+      transition: background-color 0.3s ease; /* Smooth hover transition */
+    }
+    button:hover {
+      background-color: #003366; /* Darker blue on hover */
+    }
+    .back-link {
+      display: block;
+      margin-top: 15px;
+      color: #4682b4; /* Blue link */
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>User Details</h2>
+
+  <form id="profileForm">
+
+    <!-- 1. Name -->
+    <input type="text" id="name" placeholder="Name" required><br><br>
+
+    <!-- 2. Gender -->
+    <select id="gender" required>
+      <option value="">Select Gender</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Other">Other</option>
+    </select><br><br>
+
+    <!-- 3. Date of Birth -->
+    <input type="date" id="dob" required><br><br>
+
+    <!-- 4. Phone Number -->
+    <input type="text" id="phone" placeholder="Phone Number" required><br><br>
+
+    <!-- 5. Location / Taluka -->
+    <select id="location" required>
+      <option value="">Select Taluka</option>
+      <option value="Pernem">Pernem</option>
+      <option value="Bardez">Bardez</option>
+      <option value="Bicholim">Bicholim</option>
+      <option value="Sattari">Sattari</option>
+      <option value="Tiswadi">Tiswadi</option>
+      <option value="Ponda">Ponda</option>
+      <option value="Mormugao">Mormugao</option>
+      <option value="Salcette">Salcette</option>
+      <option value="Dharbandora">Dharbandora</option>
+      <option value="Sanguem">Sanguem</option>
+      <option value="Quepem">Quepem</option>
+      <option value="Canacona">Canacona</option>
+    </select><br><br>
+
+    <button type="submit">Save Details</button>
+
+  </form>
+</div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
+    authDomain: "hospital-system-88ee9.firebaseapp.com",
+    projectId: "hospital-system-88ee9",
+    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  document.getElementById("profileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const user = auth.currentUser;
+    if (!user) {
+      alert("You must be signed in!");
+      return;
+    }
+
+    // 1. Get the security token from Firebase
+    const token = await user.getIdToken();
+
+    const profileData = {
+      name: document.getElementById("name").value,
+      gender: document.getElementById("gender").value,
+      dob: document.getElementById("dob").value,
+      phone: document.getElementById("phone").value,
+      taluka: document.getElementById("location").value
+    };
+
+    try {
+      // 2. Send data to your NODE SERVER (/api/auth/profile)
+      const response = await fetch("/api/auth/profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(profileData)
+      });
+
+      // 3. Check if response is JSON (prevents the DOCTYPE error)
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const result = await response.json();
+        alert("Success: " + result.message);
+        window.location.href = "dashboard.html"; 
+      } else {
+        throw new Error("Server sent back HTML instead of JSON. Check your API route.");
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Error: " + err.message);
+    }
+  });
+</script>
+
+</body>
+</html>

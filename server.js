@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const admin = require("firebase-admin");
+const cors = require("cors"); // <--- 1. ADDED THIS LINE
 
 /* 🔥 Initialize Firebase Admin */
 const serviceAccount = require("./firebaseServiceKey.json");
@@ -14,6 +15,22 @@ if (!admin.apps.length) {
 }
 
 const app = express();
+
+// --- 2. ADDED THIS CONFIGURATION BLOCK ---
+const corsOptions = {
+  origin: [
+    "http://localhost:5500", // For your local testing
+    "http://localhost:3000", // For your local testing
+    "https://hospital-system-88ee9.web.app", // Your Live Firebase App
+    "https://hospital-system-88ee9.firebaseapp.com" // Your Live Firebase App (Alternate)
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+// -----------------------------------------
+
 app.use(express.json());
 
 /* 🔗 API ROUTES FIRST */

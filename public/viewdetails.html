@@ -58,22 +58,12 @@
                 try {
                     const token = await user.getIdToken();
                     
-                    // 1. Try fetching from the first likely address
-                    let response = await fetch(`${BASE_URL}/api/auth/profile-data`, {
+                    // DIRECTLY Call the correct route
+                    const response = await fetch(`${BASE_URL}/api/auth/profile-data`, {
                         method: "GET",
                         headers: { "Authorization": `Bearer ${token}` }
                     });
 
-                    // 2. If that fails with 404, try the second likely address
-                    if (response.status === 404) {
-                        console.log("Retrying with /profile...");
-                        response = await fetch(`${BASE_URL}/api/auth/profile`, {
-                            method: "GET",
-                            headers: { "Authorization": `Bearer ${token}` }
-                        });
-                    }
-
-                    // 3. Handle Result
                     if (response.ok) {
                         const data = await response.json();
                         document.getElementById("name").value = data.name || "N/A";
@@ -81,13 +71,18 @@
                         document.getElementById("dob").value = data.dob || "";
                         document.getElementById("phone").value = data.phone || "N/A";
                         document.getElementById("taluka").value = data.taluka || "N/A";
+                    } else if (response.status === 404) {
+                        // 404 here just means the user hasn't saved details yet
+                        document.getElementById("name").value = "Not Set";
+                        alert("No profile details found. Please go to 'Edit Details' to set them up!");
                     } else {
-                        // SHOW REAL ERROR
+                        // Real server error
                         const errorText = await response.text();
+                        console.error("Server Error:", errorText);
                         alert(`Server Error (${response.status}): ${errorText}`);
                     }
                 } catch (error) {
-                    console.error("Error fetching data:", error);
+                    console.error("Fetch Error:", error);
                     alert("Network Error: " + error.message);
                 }
             } else {

@@ -3,89 +3,17 @@
 <head>
   <title>Change My Details</title>
   <style>
-    body {
-      background-color: #f0f8ff; /* Alice blue for a light blue background */
-      font-family: 'Segoe UI', sans-serif;
-      color: #003366; /* Dark blue for text */
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-    .container {
-      background-color: #ffffff; /* White background for container */
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15); /* Subtle shadow with blue tint */
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      border: 1px solid #e0e0e0; /* Light border for professionalism */
-    }
-    h2 {
-      color: #003366; /* Dark blue for heading */
-      margin-bottom: 20px;
-      font-size: 24px;
-      font-weight: 600;
-    }
-    label {
-      display: block;
-      text-align: left;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #003366; /* Dark blue for labels */
-    }
-    input, select {
-      border: 2px solid #b0c4de; /* Light steel blue border */
-      padding: 12px;
-      margin: 5px 0 15px 0;
-      width: 100%;
-      box-sizing: border-box;
-      border-radius: 5px;
-      font-size: 16px;
-      transition: border-color 0.3s ease; /* Smooth transition for focus */
-    }
-    input:focus, select:focus {
-      border-color: #4682b4; /* Steel blue on focus */
-      outline: none;
-    }
-    
-    /* Style for the locked email field */
-    input[readonly] {
-      background-color: #f9f9f9; /* Slightly off-white */
-      cursor: not-allowed;
-      border-color: #e0e0e0; /* Lighter border */
-      color: #666; /* Gray text */
-    }
-    
-    button {
-      background-color: #4682b4; /* Steel blue for button */
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      width: 100%;
-      font-weight: 500;
-      transition: background-color 0.3s ease; /* Smooth hover transition */
-      margin-top: 10px;
-    }
-    button:hover {
-      background-color: #003366; /* Darker blue on hover */
-    }
-    .back-link {
-      display: block;
-      margin-top: 15px;
-      color: #4682b4; /* Blue link */
-      text-decoration: none;
-      font-size: 14px;
-    }
-    .back-link:hover {
-      text-decoration: underline;
-    }
+    body { background-color: #f0f8ff; font-family: 'Segoe UI', sans-serif; color: #003366; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .container { background-color: #ffffff; padding: 40px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15); width: 100%; max-width: 400px; text-align: center; border: 1px solid #e0e0e0; }
+    h2 { color: #003366; margin-bottom: 20px; font-size: 24px; font-weight: 600; }
+    label { display: block; text-align: left; margin-top: 10px; font-weight: bold; color: #003366; }
+    input, select { border: 2px solid #b0c4de; padding: 12px; margin: 5px 0 15px 0; width: 100%; box-sizing: border-box; border-radius: 5px; font-size: 16px; transition: border-color 0.3s ease; }
+    input:focus, select:focus { border-color: #4682b4; outline: none; }
+    input[readonly] { background-color: #f9f9f9; cursor: not-allowed; border-color: #e0e0e0; color: #666; }
+    button { background-color: #4682b4; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; font-weight: 500; transition: background-color 0.3s ease; margin-top: 10px; }
+    button:hover { background-color: #003366; }
+    .back-link { display: block; margin-top: 15px; color: #4682b4; text-decoration: none; font-size: 14px; }
+    .back-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -128,13 +56,15 @@
       <option value="Canacona">Canacona</option>
     </select>
 
-    <button type="submit">Update Details</button>
+    <button type="submit" id="submitBtn">Update Details</button>
   </form>
   <a href="dashboard.html" class="back-link">Back to Dashboard</a>
 </div>
 
 <script type="module">
+  // 1. Define URL first
   const BASE_URL = "https://hospital-appointment-system-oogs.onrender.com";
+
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
@@ -148,21 +78,21 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
+  // 2. Load Data on Page Load
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "index.html";
       return;
     }
 
-    // Pre-fill the email from Auth immediately
     document.getElementById("email").value = user.email;
 
-    // Pre-fill the rest from Firestore
     try {
       const token = await user.getIdToken();
+      // CLEANER FETCH CALL
       const response = await fetch(`${BASE_URL}/api/auth/profile-data`, {
-    headers: { "Authorization": `Bearer ${token}` }
-});
+        headers: { "Authorization": `Bearer ${token}` }
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -172,43 +102,59 @@
         document.getElementById("phone").value = data.phone || "";
         document.getElementById("location").value = data.taluka || "Tiswadi";
       }
-    } catch (err) { console.error("Error loading data:", err); }
+    } catch (err) {
+      console.error("Error loading data:", err);
+    }
   });
 
+  // 3. Handle Update Button Click
   document.getElementById("updateForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const user = auth.currentUser;
-    const token = await user.getIdToken();
-
-    // Note: We don't even include the email in this object so the backend never receives it to update
-    const updatedData = {
-      name: document.getElementById("name").value,
-      gender: document.getElementById("gender").value,
-      dob: document.getElementById("dob").value,
-      phone: document.getElementById("phone").value,
-      taluka: document.getElementById("location").value
-    };
+    
+    // Change button text to show it's working
+    const btn = document.getElementById("submitBtn");
+    btn.textContent = "Updating...";
+    btn.disabled = true;
 
     try {
+      const user = auth.currentUser;
+      const token = await user.getIdToken();
+
+      const updatedData = {
+        name: document.getElementById("name").value,
+        gender: document.getElementById("gender").value,
+        dob: document.getElementById("dob").value,
+        phone: document.getElementById("phone").value,
+        taluka: document.getElementById("location").value
+      };
+
+      // CLEANER POST FETCH CALL
       const response = await fetch(`${BASE_URL}/api/auth/profile`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify(updatedData)
-});
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedData)
+      });
 
       if (response.ok) {
         alert("Details updated successfully!");
         window.location.href = "viewdetails.html";
       } else {
-  // This will read the real error message from the server
-  const errorText = await response.text();
-  alert(`Server Error (${response.status}): ${errorText}`);
-  console.error("Server Error:", errorText);
-}
-    } catch (err) { console.error(err); }
+        // CAPTURE AND SHOW THE ERROR
+        const errorText = await response.text();
+        console.error("Server Error:", errorText);
+        alert(`Update Failed! Server Error (${response.status}): ${errorText}`);
+      }
+    } catch (err) {
+      console.error("Network Error:", err);
+      alert("Network Error: " + err.message);
+    } finally {
+      // Reset button
+      btn.textContent = "Update Details";
+      btn.disabled = false;
+    }
   });
 </script>
 </body>

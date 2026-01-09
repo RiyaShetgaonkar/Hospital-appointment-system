@@ -87,6 +87,7 @@
 </div>
 
 <script type="module">
+  const BASE_URL = "https://hospital-appointment-system-oogs.onrender.com";
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
@@ -116,10 +117,10 @@
       const token = await user.getIdToken();
       
       // Initialize user in our Firestore via Node backend
-      await fetch("/api/auth/init-user", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${token}` }
-      });
+  await fetch(`${BASE_URL}/api/auth/init-user`, {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${token}` }
+});
 
       alert("Login successful!");
       window.location.href = "dashboard.html";

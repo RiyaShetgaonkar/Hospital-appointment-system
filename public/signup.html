@@ -90,6 +90,7 @@
 
 <!-- Firebase SDK -->
 <script type="module">
+  const BASE_URL = "https://hospital-appointment-system-oogs.onrender.com";
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
@@ -122,14 +123,14 @@ const firebaseConfig = {
       const idToken = await user.getIdToken();
 
       // Send token to backend
-      const res = await fetch("http://localhost:5000/api/auth/init-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${idToken}`
-        },
-        body: JSON.stringify({ email })
-      });
+     const res = await fetch(`${BASE_URL}/api/auth/init-user`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${idToken}`
+    },
+    body: JSON.stringify({ email })
+});
 
       const data = await res.json();
       alert(data.message);

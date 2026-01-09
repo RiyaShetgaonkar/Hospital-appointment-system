@@ -123,6 +123,7 @@
   </form>
 </div>
 <script type="module">
+  const BASE_URL = "https://hospital-appointment-system-oogs.onrender.com";
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
@@ -158,14 +159,14 @@
 
     try {
       // 2. Send data to your NODE SERVER (/api/auth/profile)
-      const response = await fetch("/api/auth/profile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(profileData)
-      });
+     const response = await fetch(`${BASE_URL}/api/auth/profile`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(profileData)
+});
 
       // 3. Check if response is JSON (prevents the DOCTYPE error)
       const contentType = response.headers.get("content-type");

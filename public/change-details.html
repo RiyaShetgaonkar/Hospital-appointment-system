@@ -134,6 +134,7 @@
 </div>
 
 <script type="module">
+  const BASE_URL = "https://hospital-appointment-system-oogs.onrender.com";
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
@@ -159,9 +160,9 @@
     // Pre-fill the rest from Firestore
     try {
       const token = await user.getIdToken();
-      const response = await fetch("/api/auth/profile-data", {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
+      const response = await fetch(`${BASE_URL}/api/auth/profile-data`, {
+    headers: { "Authorization": `Bearer ${token}` }
+});
 
       if (response.ok) {
         const data = await response.json();
@@ -189,21 +190,24 @@
     };
 
     try {
-      const response = await fetch("/api/auth/profile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(updatedData)
-      });
+      const response = await fetch(`${BASE_URL}/api/auth/profile`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(updatedData)
+});
 
       if (response.ok) {
         alert("Details updated successfully!");
         window.location.href = "viewdetails.html";
       } else {
-        alert("Update failed.");
-      }
+  // This will read the real error message from the server
+  const errorText = await response.text();
+  alert(`Server Error (${response.status}): ${errorText}`);
+  console.error("Server Error:", errorText);
+}
     } catch (err) { console.error(err); }
   });
 </script>

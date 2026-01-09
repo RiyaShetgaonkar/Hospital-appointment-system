@@ -28,6 +28,7 @@
   </div>
 
 <script type="module">
+const BASE_URL = "https://hospital-appointment-system-oogs.onrender.com";
 import { db } from "./app.js";
 
 import {
@@ -63,9 +64,9 @@ onAuthStateChanged(auth, async (user) => {
 
   const token = await user.getIdToken();
 
-  const response = await fetch("/api/auth/profile-data", {
+ const response = await fetch(`${BASE_URL}/api/auth/profile-data`, {
     headers: { Authorization: `Bearer ${token}` }
-  });
+});
 
   userData = await response.json();
 

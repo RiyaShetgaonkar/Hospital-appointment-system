@@ -70,8 +70,8 @@ We chose a **Serverless & Real-Time** architecture to handle the high concurrenc
 ---
 
 ## 👥 Team
-Farah Imran Cutchi
-Riya Shetgaonkar  
+* **Farah Imran Cutchi**
+* **Riya Shetgaonkar**  
 
 ---
 

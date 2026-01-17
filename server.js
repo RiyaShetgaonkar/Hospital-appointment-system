@@ -18,15 +18,18 @@ const app = express();
 
 // --- 2. ADDED THIS CONFIGURATION BLOCK ---
 const corsOptions = {
-  origin: [
-    "http://localhost:5500", // For your local testing
-    "http://localhost:3000", // For your local testing
-    "https://hospital-system-88ee9.web.app", // Your Live Firebase App
-    "https://hospital-system-88ee9.firebaseapp.com" // Your Live Firebase App (Alternate)
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
+    origin: [
+        "http://localhost:3000",       // React / Standard Localhost
+        "http://localhost:5000",       // <--- ADD THIS (Node Server Localhost)
+        "http://localhost:5500",       // VS Code Live Server
+        "http://127.0.0.1:5500",       // VS Code Live Server (IP version)
+        "https://hospital-system-88ee9.web.app", 
+        "https://hospital-system-88ee9.firebaseapp.com"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
 };
+
 
 app.use(cors(corsOptions));
 // -----------------------------------------

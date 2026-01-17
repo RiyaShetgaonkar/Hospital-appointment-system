@@ -3,11 +3,14 @@
 <head>
   <title>Care Connect - Home</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
-      background-color: #f0f8ff;
-      font-family: 'Arial', sans-serif;
-      color: #003366;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
+      font-family: 'Roboto', sans-serif;
+      color: #2c3e50;
       margin: 0;
       padding: 0;
       height: 100vh;
@@ -19,13 +22,25 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 8px rgba(0, 51, 102, 0.15);
-      border-bottom: 2px solid #4682b4;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-bottom: 3px solid #3498db;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+    .logo-img {
+      width: 50px;
+      height: 50px;
+      margin-right: 15px;
+      border-radius: 50%;
+      object-fit: cover;
     }
     .logo {
       font-size: 32px;
-      color: #003366;
-      font-weight: bold;
+      color: #2c3e50;
+      font-weight: 700;
+      font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
     }
     .profile {
       position: relative;
@@ -33,11 +48,17 @@
     }
     .profile i {
       font-size: 35px;
-      color: #4682b4;
-      border: 3px solid #4682b4;
+      color: #3498db;
+      border: 3px solid #3498db;
       border-radius: 50%;
       padding: 5px;
       background-color: #ffffff;
+      transition: all 0.3s ease;
+    }
+    .profile i:hover {
+      color: #2980b9;
+      border-color: #2980b9;
+      transform: scale(1.05);
     }
     .dropdown {
       display: none;
@@ -45,30 +66,108 @@
       right: 0;
       top: 50px;
       background-color: #ffffff;
-      border: 2px solid #4682b4;
+      border: 2px solid #3498db;
       border-radius: 8px;
-      min-width: 150px;
+      min-width: 180px;
       z-index: 1;
-      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     }
     .dropdown a {
-      color: #003366;
-      padding: 10px 12px;
+      color: #2c3e50;
+      padding: 12px 16px;
       text-decoration: none;
       display: block;
       font-size: 16px;
       font-weight: 500;
+      transition: background-color 0.3s ease;
     }
     .dropdown a:hover {
-      background-color: #f0f8ff;
+      background-color: #ecf0f1;
     }
     .main-body {
-      padding: 50px 40px;
+      padding: 60px 40px;
       display: flex;
       flex-direction: column;
       align-items: center;
       max-width: 1200px;
       margin: 0 auto;
+    }
+    .welcome {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .welcome h1 {
+      font-size: 36px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    .welcome p {
+      font-size: 18px;
+      font-weight: 400;
+      color: #7f8c8d;
+      max-width: 700px;
+      line-height: 1.7;
+    }
+    .hospitals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 30px;
+      width: 100%;
+      justify-items: center;
+    }
+    .hospital-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f1f8ff 50%, #e3f2fd 100%);
+      border: 1px solid #e1e8ed;
+      border-radius: 16px;
+      padding: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+    .hospital-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
+    }
+    .hospital-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      border-color: #3498db;
+    }
+    .hospital-card i {
+      font-size: 48px;
+      color: #3498db;
+      margin-right: 20px;
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    .hospital-card:hover i {
+      color: #2980b9;
+      background-color: #d4edda;
+    }
+    .hospital-card .content h3 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 8px;
+    }
+    .hospital-card .content p {
+      font-size: 16px;
+      font-weight: 400;
+      color: #7f8c8d;
     }
   </style>
 </head>
@@ -76,8 +175,10 @@
 <body>
 
 <header>
-  <div></div>
-  <div class="logo">Care Connect</div>
+  <div class="logo-container">
+    <img src="logo.jpeg" alt="Care Connect Logo" class="logo-img">
+    <div class="logo">Care Connect</div>
+  </div>
   <div class="profile" id="profile">
     <i class="fas fa-user-circle"></i>
     <div class="dropdown" id="dropdown">
@@ -88,16 +189,21 @@
   </div>
 </header>
 
-<div class="main-body"> <div class="welcome"> <h1>Welcome to Care Connect</h1> <p>Your gateway to quality healthcare in Goa. Select a hospital below to explore services and book appointments.</p> </div> 
-<div class="hospital-card"
-     onclick="window.location.href='appointment-page.html'">
-  <i class="fas fa-hospital"></i>
-  <div class="content">
-    <h3>Goa Medical College and Hospital (GMC)</h3>
-    <p>Bambolim (Central Goa) - Comprehensive healthcare services.</p>
+<div class="main-body">
+  <div class="welcome">
+    <h1>Welcome to Care Connect</h1>
+    <p>Your gateway to quality healthcare in Goa. Explore trusted hospitals and medical centers, browse profiles, check doctor availability, and book appointments seamlessly. We connect you with reliable providers for timely, accessible, and quality care for you and your family.</p>
+  </div>
+  <div class="hospitals-grid">
+    <div class="hospital-card" onclick="window.location.href='appointment-page.html'">
+      <i class="fas fa-hospital"></i>
+      <div class="content">
+        <h3>Goa Medical College and Hospital (GMC)</h3>
+        <p>Bambolim, Central Goa </p>
+      </div>
+    </div>
   </div>
 </div>
-
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -137,7 +243,7 @@ window.addEventListener('popstate', () => {
   await signOut(auth);
 
   // 🔒 Replace instead of redirect (kills browser history)
-  window.location.replace("login.html");
+  window.location.replace("index.html");
 });
 
 

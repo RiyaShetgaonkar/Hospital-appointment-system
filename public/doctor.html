@@ -1,120 +1,353 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Doctor Panel - Queue Monitor</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Panel - Queue Monitor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
+            font-family: 'Roboto', sans-serif;
+            color: #2c3e50;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-bottom: 3px solid #3498db;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .logo {
+            font-size: 32px;
+            color: #2c3e50;
+            font-weight: 700;
+            font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+        }
+        .main-body {
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            border: 1px solid #e1e8ed;
+            position: relative;
+            overflow: hidden;
+        }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+        }
+        select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px 0;
+            border-radius: 8px;
+            border: 2px solid #b0c4de;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            color: #2c3e50;
+            transition: border-color 0.3s ease;
+        }
+        select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .current-patient-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f1f8ff 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #b3d7ff;
+        }
+        .current-patient-box h3 {
+            color: #2c3e50;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        #currentPatient {
+            font-size: 28px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        #statusMsg {
+            font-size: 14px;
+            color: #27ae60;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            background: #d4edda;
+            border-radius: 6px;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+        #nextBtn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            font-weight: bold;
+        }
+        #nextBtn:hover {
+            background-color: #2980b9;
+        }
+        #queueList {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        #queueList li {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+        #eta {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        #resetBtn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 30px;
+            font-size: 14px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        #resetBtn:hover {
+            opacity: 1;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>Doctor Panel</h1>
+    <header>
+        <div class="logo-container">
+            <img src="logo.jpeg" alt="Care Connect Logo" class="logo-img">
+            <div class="logo">Care Connect</div>
+        </div>
+    </header>
 
-    <label>Select Clinic</label>
-    <select id="clinicSelect">
-      <option value="">Select Clinic</option>
-      <option value="Dermatology">Dermatology</option>
-      <option value="Orthopedics">Orthopedics</option>
-      <option value="Cardiology">Cardiology</option>
-      <option value="ENT">ENT</option>
-    </select>
+    <div class="main-body">
+        <div class="container">
+            <h1>Doctor Panel</h1>
 
-    <h3>Current Patient</h3>
-    <div id="currentPatient" class="current">None</div>
+            <label for="clinicSelect">Current Clinic Location</label>
+            <select id="clinicSelect">
+                <option value="">-- Choose Clinic --</option>
+                <option value="Dermatology">Dermatology</option>
+                <option value="Orthopedics">Orthopedics</option>
+                <option value="Cardiology">Cardiology</option>
+                <option value="ENT">ENT</option>
+            </select>
 
-    <button id="nextBtn">Call Next Patient</button>
+            <div class="current-patient-box">
+                <h3>Now Serving</h3>
+                <div id="currentPatient" style="font-size: 26px; font-weight: bold; color: #007bff;">None</div>
+                <div id="statusMsg" class="status-msg">Notification Sent to Sheet! ✅</div>
+            </div>
 
-    <h3>Queue</h3>
-    <ul id="queueList"></ul>
+            <button id="nextBtn">Call Next Patient</button>
 
-    <h3>Estimated Waiting Time</h3>
-    <div id="eta">—</div>
-  </div>
+            <div style="margin-top: 30px; text-align: left;">
+                <strong>Waiting Queue:</strong>
+                <ul id="queueList"></ul>
+            </div>
+
+            <div style="margin-top: 15px; font-weight: bold; color: #666;">
+                Est. Total Wait: <span id="eta" style="color: #d9534f;">—</span>
+            </div>
+
+            <button id="resetBtn" class="reset-btn">Reset Daily Counters</button>
+        </div>
+    </div>
 
 <script type="module">
-  const BASE_URL = "https://hospital-appointment-system-oogs.onrender.com";
-import { db, AVG_TIME } from "./app.js";
+    const BASE_URL = "http://localhost:5000"; 
+    import { db, AVG_TIME } from "./app.js";
+    import {
+        collection, getDocs, deleteDoc, query, orderBy, onSnapshot,
+        doc, setDoc
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-import {
-  collection,
-  getDocs,
-  deleteDoc,
-  query,
-  orderBy,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    const clinicSelect = document.getElementById("clinicSelect");
+    const queueList = document.getElementById("queueList");
+    const currentBox = document.getElementById("currentPatient");
+    const etaBox = document.getElementById("eta");
+    const nextBtn = document.getElementById("nextBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const statusMsg = document.getElementById("statusMsg");
 
-const clinicSelect = document.getElementById("clinicSelect");
-const queueList = document.getElementById("queueList");
-const currentBox = document.getElementById("currentPatient");
-const etaBox = document.getElementById("eta");
-const nextBtn = document.getElementById("nextBtn");
+    let queueRef = null;
+    let unsubscribe = null;
 
-let queueRef = null;
-let unsubscribe = null;
-let currentPatient = null;
+    /* 🔁 1. Real-time Queue Monitor */
+    clinicSelect.onchange = () => {
+        if (unsubscribe) unsubscribe();
+        const clinic = clinicSelect.value;
+        if (!clinic) {
+            queueList.innerHTML = "";
+            etaBox.textContent = "—";
+            return;
+        }
 
-/* 🔁 Load queue */
-clinicSelect.onchange = () => {
-  if (unsubscribe) unsubscribe();
+        queueRef = collection(db, "queue", clinic, "patients");
+        const q = query(queueRef, orderBy("time", "asc"));
 
-  const clinic = clinicSelect.value;
-  if (!clinic) return;
+        unsubscribe = onSnapshot(q, (snapshot) => {
+            queueList.innerHTML = "";
+            let count = 0;
+            snapshot.forEach((docSnap) => {
+                const d = docSnap.data();
+                const li = document.createElement("li");
+                li.innerHTML = `<span>Token <strong>#${d.token}</strong></span> <span>${d.name || "N/A"}</span>`;
+                queueList.appendChild(li);
+                count++;
+            });
+            etaBox.textContent = count > 0 ? `${count * AVG_TIME} minutes` : "Queue Empty";
+        });
+    };
 
-  queueRef = collection(db, "queue", clinic, "patients");
-  const q = query(queueRef, orderBy("time", "asc"));
+    /* ▶️ 2. Logic to Call Next Patient & Trigger Email Notification */
+    nextBtn.onclick = async () => {
+        const clinic = clinicSelect.value;
+        if (!clinic) { alert("Please select a clinic first"); return; }
 
-  unsubscribe = onSnapshot(q, (snapshot) => {
-    queueList.innerHTML = "";
-    let count = 0;
+        const q = query(queueRef, orderBy("time", "asc"));
+        const snap = await getDocs(q);
 
-    snapshot.forEach((docSnap) => {
-      const d = docSnap.data();
+        if (snap.empty) {
+            currentBox.textContent = "None";
+            await setDoc(doc(db, "clinic_status", clinic), { currentlyServing: 0 }, { merge: true });
+            return;
+        }
 
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <strong>Token ${d.token}</strong><br>
-        Name: ${d.name || "N/A"}<br>
-        Phone: ${d.phone || "N/A"}<br>
-        Email: ${d.email || "N/A"}<br>
-        DOB: ${d.dob || "N/A"}
-      `;
-      queueList.appendChild(li);
-      count++;
-    });
+        const firstDoc = snap.docs[0];
+        const currentData = firstDoc.data();
 
-    etaBox.textContent =
-      count > 0 ? `${count * AVG_TIME} minutes` : "No waiting";
-  });
-};
+        // A. Update Serving Status in Firestore
+        const statusRef = doc(db, "clinic_status", clinic);
+        await setDoc(statusRef, { currentlyServing: currentData.token }, { merge: true });
 
-/* ▶️ Call next patient */
-nextBtn.onclick = async () => {
-  if (!queueRef) {
-    alert("Select a clinic first");
-    return;
-  }
+        // B. Find "Lucky Patient" (3 spots ahead)
+        // Token rollover logic (1-50)
+        const targetToken = ((Number(currentData.token) + 2) % 50) + 1; 
+        
+        console.log(`Searching for Token #${targetToken} to send notification...`);
 
-  const q = query(queueRef, orderBy("time", "asc"));
-  const snap = await getDocs(q);
+        const luckyPatient = snap.docs.find(doc => Number(doc.data().token) === Number(targetToken));
 
-  if (snap.empty) {
-    currentBox.textContent = "None";
-    return;
-  }
+        if (luckyPatient) {
+            const p = luckyPatient.data();
+            console.log(`🎯 Found Token #${targetToken}: ${p.name} (${p.email})`);
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/auth/trigger-instant-relay`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        phone: p.phone,
+                        userName: p.name,
+                        clinicName: clinic,
+                        tokenNumber: p.token,
+                        email: p.email || "N/A"
+                    })
+                });
 
-  const first = snap.docs[0];
-  currentPatient = first.data();
+                if (response.ok) {
+                    statusMsg.textContent = `Notification Sent to ${p.name}! ✅`;
+                    statusMsg.style.display = "block";
+                    setTimeout(() => { statusMsg.style.display = "none"; }, 5000);
+                }
+            } catch (err) {
+                console.error("Backend connection failed:", err);
+            }
+        } else {
+            console.log(`ℹ️ Token #${targetToken} is not in the queue yet.`);
+        }
 
-  currentBox.innerHTML = `
-    <strong>Token ${currentPatient.token}</strong><br>
-    Name: ${currentPatient.name || "N/A"}<br>
-    Phone: ${currentPatient.phone || "N/A"}
-  `;
+        // C. Update UI and Delete the current patient from queue
+        currentBox.innerHTML = `Token #${currentData.token}<br><small>${currentData.name}</small>`;
+        await deleteDoc(firstDoc.ref);
+    };
 
-  await deleteDoc(first.ref);
-};
+    /* 🔄 3. Reset Daily Counters */
+    resetBtn.onclick = async () => {
+        const clinic = clinicSelect.value;
+        if (!clinic) { alert("Select a clinic to reset"); return; }
+        
+        if (confirm("Reset Token sequence back to 1 for this clinic?")) {
+            const statusRef = doc(db, "clinic_status", clinic);
+            await setDoc(statusRef, { lastTokenIssued: 0, currentlyServing: 0 }, { merge: true });
+            alert("Clinic Counters Reset!");
+            currentBox.textContent = "None";
+        }
+    };
 </script>
-
 </body>
 </html>

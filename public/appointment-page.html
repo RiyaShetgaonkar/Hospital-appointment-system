@@ -1,164 +1,333 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Patient Panel</title>
-  <link rel="stylesheet" href="style.css">
-   <style>
-        body { background-color: #f0f8ff; font-family: 'Segoe UI', sans-serif; color: #003366; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background-color: #ffffff; padding: 40px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15); width: 100%; max-width: 400px; text-align: center; border: 1px solid #e0e0e0; }
-        h2 { color: #003366; margin-bottom: 20px; font-size: 24px; font-weight: 600; }
-        label { display: block; text-align: left; margin-bottom: 5px; font-weight: bold; color: #003366; }
-        input[type="text"], input[type="date"] { border: 2px solid #b0c4de; padding: 12px; margin: 10px 0; width: 100%; box-sizing: border-box; border-radius: 5px; background-color: #f9f9f9; font-size: 16px; color: #003366; transition: border-color 0.3s ease; }
-        .back-button { background-color: #4682b4; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; text-decoration: none; display: inline-block; margin-bottom: 20px; font-weight: 500; transition: background-color 0.3s ease; }
-        .back-button:hover { background-color: #003366; }
-        
-        /* New Style for ETA */
-        #etaBox { font-size: 18px; color: #d9534f; font-weight: bold; margin-bottom: 20px; }
+    <meta charset="UTF-8">
+    <title>Patient Panel - Book Appointment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
+            font-family: 'Roboto', sans-serif;
+            color: #2c3e50;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-bottom: 3px solid #3498db;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .logo {
+            font-size: 32px;
+            color: #2c3e50;
+            font-weight: 700;
+            font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+        }
+        .main-body {
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid #e1e8ed;
+            position: relative;
+            overflow: hidden;
+        }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+        p {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        select {
+            border: 2px solid #b0c4de;
+            padding: 12px;
+            margin: 10px 0 20px;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            color: #2c3e50;
+            transition: border-color 0.3s ease;
+        }
+        select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .back-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #2980b9;
+        }
+        #tokenBox {
+            font-size: 48px;
+            font-weight: bold;
+            color: #3498db;
+            margin: 20px 0;
+            border: 2px dashed #3498db;
+            padding: 15px;
+            border-radius: 12px;
+            background-color: #f1f8ff;
+        }
+        #etaBox {
+            font-size: 18px;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        #submit {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        #submit:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .info-text {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        h3 {
+            color: #2c3e50;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 20px 0 10px;
+        }
     </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1>Take Appointment</h1>
 
-    <p><strong>Patient:</strong> <span id="patientName">Loading...</span></p>
+<header>
+    <div class="logo-container">
+        <img src="logo.jpeg" alt="Care Connect Logo" class="logo-img">
+        <div class="logo">Care Connect</div>
+    </div>
+</header>
 
-    <label>Select Clinic</label>
-    <select id="clinic">
-      <option value="">Select Clinic</option>
-      <option value="Dermatology">Dermatology</option>
-      <option value="Orthopedics">Orthopedics</option>
-      <option value="Cardiology">Cardiology</option>
-      <option value="ENT">ENT</option>
-    </select>
-     <button id="submit">Get Token</button>
+<div class="main-body">
+    <div class="container">
+        <h1>Book Token</h1>
+        <p><strong>Patient:</strong> <span id="patientName">Loading...</span></p>
 
-    <h3>Your Token</h3>
-    <div id="tokenBox">—</div>
-    
-    <h3>Estimated Wait Time</h3>
-    <div id="etaBox">Select a clinic...</div>
+        <label for="clinic">Select Clinic</label>
+        <select id="clinic">
+            <option value="">-- Choose Clinic --</option>
+            <option value="Dermatology">Dermatology</option>
+            <option value="Orthopedics">Orthopedics</option>
+            <option value="Cardiology">Cardiology</option>
+            <option value="ENT">ENT</option>
+        </select>
 
-   
+        <div class="info-text">You will be notified via email when you are 3rd in line.</div>
 
-     <a href="dashboard.html" class="back-button">Back to Dashboard</a>
-        <a href="doctor.html" class="back-button">GO to Doctors panel</a>
-  </div>
+        <button id="submit">Get Token</button>
 
+        <h3>Your Assigned Token</h3>
+        <div id="tokenBox">—</div>
+
+        <h3>Estimated Wait</h3>
+        <div id="etaBox">Select a clinic...</div>
+
+        <div style="margin-top: 20px;">
+            <a href="dashboard.html" class="back-button">Dashboard</a>
+            <a href="doctor.html" class="back-button">Doctor Panel</a>
+        </div>
+    </div>
+</div>
 
 <script type="module">
-const BASE_URL = "https://hospital-appointment-system-oogs.onrender.com";
-// 1. IMPORT AVG_TIME HERE
-import { db, AVG_TIME } from "./app.js";
+    const BASE_URL = "http://localhost:5000"; 
+    import { db, AVG_TIME } from "./app.js";
+    import { collection, addDoc, getDoc, doc, setDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-import {
-  collection,
-  addDoc,
-  getDocs,
-  serverTimestamp,
-  onSnapshot // 2. IMPORT onSnapshot
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    const auth = getAuth();
+    const clinicSelect = document.getElementById("clinic");
+    const submitBtn = document.getElementById("submit");
+    const tokenBox = document.getElementById("tokenBox");
+    const patientNameUI = document.getElementById("patientName");
+    const etaBox = document.getElementById("etaBox");
 
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    let firebaseUser = null;
+    let userData = null;
+    let unsubscribe = null;
 
-const auth = getAuth();
+    /* 🔐 1. Auth Listener: Secure the Email from Firebase Auth */
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { 
+            window.location.href = "index.html"; 
+            return; 
+        }
+        firebaseUser = user; // This object contains the verified email address
+        
+        const token = await user.getIdToken();
+        try {
+            const response = await fetch(`${BASE_URL}/api/auth/profile-data`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            userData = await response.json();
+            patientNameUI.textContent = userData.name || "User";
+        } catch(e) { 
+            console.error("Profile load fail", e); 
+        }
+    });
 
-const clinicSelect = document.getElementById("clinic");
-const submitBtn = document.getElementById("submit");
-const tokenBox = document.getElementById("tokenBox");
-const patientNameUI = document.getElementById("patientName");
-const etaBox = document.getElementById("etaBox"); // 3. GET ETA ELEMENT
+    /* 🕒 2. Real-time Queue Updates */
+    clinicSelect.onchange = () => {
+        if (unsubscribe) unsubscribe();
+        const clinic = clinicSelect.value;
+        if (!clinic) { 
+            etaBox.textContent = "Select a clinic..."; 
+            return; 
+        }
 
-let firebaseUser = null;
-let userData = null;
-let unsubscribe = null; // To stop listening when switching clinics
+        const queueRef = collection(db, "queue", clinic, "patients");
+        unsubscribe = onSnapshot(queueRef, (snapshot) => {
+            const count = snapshot.size;
+            const waitTime = count * AVG_TIME;
+            etaBox.textContent = count === 0 ? "0 mins (Direct Entry)" : `~${waitTime} minutes (${count} in queue)`;
+            etaBox.style.color = count === 0 ? "green" : "#d9534f";
+        });
+    };
 
-/* 🔐 Get logged-in user + profile data */
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
+    /* 📝 3. Booking Logic: Saves Email for the Gmail Relay */
+    submitBtn.onclick = async () => {
+        if (!firebaseUser || !userData) { 
+            alert("Waiting for profile data... please wait a moment."); 
+            return; 
+        }
 
-  firebaseUser = user;
-  const token = await user.getIdToken();
+        if (!userData.phone || userData.phone === "6543456789" && !userData.name) {
+            alert("Please ensure your profile is complete before booking.");
+            return;
+        }
 
-  const response = await fetch(`${BASE_URL}/api/auth/profile-data`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+        const clinic = clinicSelect.value;
+        if (!clinic) { 
+            alert("Please select a clinic"); 
+            return; 
+        }
 
-  userData = await response.json();
-  patientNameUI.textContent = userData.name || "Unknown";
-});
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Processing...";
 
-/* 🕒 NEW: Calculate ETA when clinic changes */
-clinicSelect.onchange = () => {
-  // Stop listening to the previous clinic (if any)
-  if (unsubscribe) unsubscribe();
+        try {
+            // A. Get Token Sequence
+            const statusRef = doc(db, "clinic_status", clinic);
+            const statusSnap = await getDoc(statusRef);
+            
+            let lastTokenIssued = statusSnap.exists() ? Number(statusSnap.data().lastTokenIssued || 0) : 0;
+            let currentlyServing = statusSnap.exists() ? Number(statusSnap.data().currentlyServing || 0) : 0;
 
-  const clinic = clinicSelect.value;
-  if (!clinic) {
-      etaBox.textContent = "Select a clinic...";
-      return;
-  }
+            // B. Increment Token (1-50)
+            let tokenNumber = (lastTokenIssued % 50) + 1;
 
-  // Listen to the queue count in real-time
-  const queueRef = collection(db, "queue", clinic, "patients");
-  
-  unsubscribe = onSnapshot(queueRef, (snapshot) => {
-      const count = snapshot.size; // Total people in queue
-      const waitTime = count * AVG_TIME;
-      
-      if (count === 0) {
-          etaBox.textContent = "0 mins (You are next!)";
-          etaBox.style.color = "green";
-      } else {
-          etaBox.textContent = `~${waitTime} minutes (${count} people ahead)`;
-          etaBox.style.color = "#d9534f";
-      }
-  });
-};
+            // C. Calculate Queue Position
+            let distance = tokenNumber - currentlyServing;
+            if (distance <= 0) distance += 50; 
 
-/* 📝 Book appointment */
-submitBtn.onclick = async () => {
-  if (!firebaseUser || !userData) {
-    alert("User data not loaded");
-    return;
-  }
+            // D. Save to Firestore Queue (THIS DATA FEEDS THE GMAIL SCRIPT)
+            await addDoc(collection(db, "queue", clinic, "patients"), {
+                uid: firebaseUser.uid,
+                name: userData.name || "Patient",
+                phone: userData.phone || "N/A",
+                email: firebaseUser.email, // 🔥 CRITICAL: Must be here for Gmail reminders
+                token: tokenNumber,
+                time: serverTimestamp()
+            });
 
-  const clinic = clinicSelect.value;
-  if (!clinic) {
-    alert("Select clinic");
-    return;
-  }
+            // E. Update global counter
+            await setDoc(statusRef, { lastTokenIssued: tokenNumber }, { merge: true });
 
-  // Get current queue size for token number
-  const snap = await getDocs(
-    collection(db, "queue", clinic, "patients")
-  );
+            tokenBox.textContent = tokenNumber;
 
-  const tokenNumber = snap.size + 1;
+            if (distance <= 3) {
+                alert(`Success! Token #${tokenNumber} issued. You are next or very close. Please wait at the clinic.`);
+            } else {
+                alert(`Success! Token #${tokenNumber} issued. We will email ${firebaseUser.email} when 3 patients are ahead of you.`);
+            }
 
-  await addDoc(
-    collection(db, "queue", clinic, "patients"),
-    {
-      uid: firebaseUser.uid,
-      name: userData.name || "N/A",
-      phone: userData.phone || "N/A",
-      email: firebaseUser.email || "N/A",
-      dob: userData.dob || "N/A",
-      token: tokenNumber,
-      time: serverTimestamp()
-    }
-  );
-
-  tokenBox.textContent = tokenNumber;
-  alert(`Token ${tokenNumber} Booked!`);
-};
+        } catch (error) {
+            console.error("Booking Error:", error);
+            alert("Could not book token: " + error.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Get Token";
+        }
+    };
 </script>
 
 </body>

@@ -69,22 +69,49 @@ router.post("/trigger-instant-relay", async (req, res) => {
     }
 });
 
-/* ---------- INIT USER ---------- */
+/* ---------- INIT USER (Updated for QR Sync) ---------- */
 router.post("/init-user", verifyToken, async (req, res) => {
     try {
         const { uid, email } = req.user;
+        // 1. Get Extra Data sent from Frontend (Name & LegacyID)
+        const { name, legacyID } = req.body; 
+
         const userRef = db.collection("users").doc(uid);
         const docSnap = await userRef.get();
 
         if (!docSnap.exists) {
-            await userRef.set({
+            // 2. Prepare Basic User Data
+            let newUserData = {
                 firebaseUid: uid,
                 email: email,
+                name: name || "Unknown", // Save the name from the form!
+                role: 'patient',
                 createdAt: admin.firestore.FieldValue.serverTimestamp()
-            });
+            };
+
+            // 3. QR CODE MAGIC: Check for Legacy ID and Sync History
+            if (legacyID) {
+                console.log(`🔍 Finding Legacy Record: ${legacyID}`);
+                const legacyDoc = await db.collection('legacy_records').doc(legacyID).get();
+                
+                if (legacyDoc.exists) {
+                    const oldData = legacyDoc.data();
+                    
+                    // Merge old data into new profile
+                    newUserData.medicalHistory = oldData.history || [];
+                    newUserData.bloodGroup = oldData.bloodGroup || "N/A";
+                    newUserData.age = oldData.age || 0;
+                    
+                    console.log(`✅ Synced history for user: ${email}`);
+                }
+            }
+
+            // 4. Save to Firestore
+            await userRef.set(newUserData);
         }
-        res.json({ message: "User initialized in Firestore" });
+        res.json({ message: "User initialized & History Synced!" });
     } catch (error) {
+        console.error("Init User Error:", error);
         res.status(500).json({ message: error.message });
     }
 });

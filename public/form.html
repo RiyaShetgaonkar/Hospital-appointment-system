@@ -11,125 +11,42 @@
       background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
       font-family: 'Roboto', sans-serif;
       color: #2c3e50;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      line-height: 1.6;
+      margin: 0; padding: 0; height: 100vh; line-height: 1.6;
     }
     header {
-      background-color: #ffffff;
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border-bottom: 3px solid #3498db;
+      background-color: #ffffff; padding: 20px 40px; display: flex;
+      justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-bottom: 3px solid #3498db;
     }
-    .logo-container {
-      display: flex;
-      align-items: center;
-    }
-    .logo-img {
-      width: 50px;
-      height: 50px;
-      margin-right: 15px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .logo {
-      font-size: 32px;
-      color: #2c3e50;
-      font-weight: 700;
-       font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
-    }
-    .main-body {
-      padding: 60px 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+    .logo-container { display: flex; align-items: center; }
+    .logo-img { width: 50px; height: 50px; margin-right: 15px; border-radius: 50%; object-fit: cover; }
+    .logo { font-size: 32px; color: #2c3e50; font-weight: 700; font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif; }
+    .main-body { padding: 60px 40px; display: flex; flex-direction: column; align-items: center; max-width: 1200px; margin: 0 auto; }
     .container {
-      background-color: #ffffff;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 500px;
-      text-align: center;
-      border: 1px solid #e1e8ed;
-      position: relative;
-      overflow: hidden;
+      background-color: #ffffff; padding: 40px; border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); width: 100%; max-width: 500px;
+      text-align: center; border: 1px solid #e1e8ed; position: relative; overflow: hidden;
     }
     .container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
       background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
     }
-    h2 {
-      color: #2c3e50;
-      margin-bottom: 20px;
-      font-size: 28px;
-      font-weight: 700;
+    h2 { color: #2c3e50; margin-bottom: 20px; font-size: 28px; font-weight: 700; }
+    label { display: block; text-align: left; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
+    input[type="text"], input[type="email"], input[type="date"], select {
+      border: 2px solid #b0c4de; padding: 12px; margin: 10px 0; width: 100%;
+      box-sizing: border-box; border-radius: 8px; background-color: white;
+      font-size: 16px; transition: border-color 0.3s ease;
     }
-    label {
-      display: block;
-      text-align: left;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #2c3e50;
-    }
-    input[type="text"], input[type="date"], select {
-      border: 2px solid #b0c4de;
-      padding: 12px;
-      margin: 10px 0;
-      width: 100%;
-      box-sizing: border-box;
-      border-radius: 8px;
-      background-color: white;
-      font-size: 16px;
-      transition: border-color 0.3s ease;
-    }
-    input[type="text"]:focus, input[type="date"]:focus, select:focus {
-      outline: none;
-      border-color: #3498db;
-      box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-    }
-    select {
-      cursor: pointer;
-    }
+    /* Style for Read-Only fields (Email) */
+    input[readonly] { background-color: #e9ecef; cursor: not-allowed; color: #6c757d; }
+    input:focus, select:focus { outline: none; border-color: #3498db; box-shadow: 0 0 5px rgba(52, 152, 219, 0.5); }
     button {
-      background-color: #3498db;
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      width: 100%;
-      margin-top: 10px;
-      font-weight: 500;
-      transition: background-color 0.3s ease;
+      background-color: #3498db; color: white; padding: 12px 20px; border: none;
+      border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%;
+      margin-top: 10px; font-weight: 500; transition: background-color 0.3s ease;
     }
-    button:hover {
-      background-color: #2980b9;
-    }
-    .back-link {
-      display: block;
-      margin-top: 15px;
-      color: #3498db;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-    }
-    .back-link:hover {
-      text-decoration: underline;
-    }
+    button:hover { background-color: #2980b9; }
   </style>
 </head>
 <body>
@@ -143,15 +60,16 @@
 
 <div class="main-body">
   <div class="container">
-    <h2>User Details</h2>
+    <h2>Complete Your Profile</h2>
 
     <form id="profileForm">
+      
+      <label for="email">Email Address</label>
+      <input type="email" id="email" value="Loading..." readonly>
 
-      <!-- 1. Name -->
       <label for="name">Full Name</label>
       <input type="text" id="name" placeholder="Enter your name" required>
 
-      <!-- 2. Gender -->
       <label for="gender">Gender</label>
       <select id="gender" required>
         <option value="">Select Gender</option>
@@ -160,15 +78,14 @@
         <option value="Other">Other</option>
       </select>
 
-      <!-- 3. Date of Birth -->
       <label for="dob">Date of Birth</label>
       <input type="date" id="dob" required>
+      <label for="bloodGroup">Blood Group</label>
+      <input type="text" id="bloodGroup" required>
 
-      <!-- 4. Phone Number -->
       <label for="phone">Phone Number</label>
       <input type="text" id="phone" placeholder="Enter your phone number" required>
 
-      <!-- 5. Location / Taluka -->
       <label for="location">Taluka</label>
       <select id="location" required>
         <option value="">Select Taluka</option>
@@ -193,7 +110,12 @@
 </div>
 
 <script type="module">
-  const BASE_URL = "https://hospital-appointment-system-oogs.onrender.com";
+  // AUTOMATICALLY DETECT ENVIRONMENT
+const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+const BASE_URL = isLocal 
+    ? "http://localhost:5000"                              // If on laptop, use Local Backend
+    : "https://hospital-appointment-system-oogs.onrender.com"; // If on web, use Live Render Backend
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
@@ -207,45 +129,73 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
+  // ✅ THIS IS THE NEW PART: Auto-fill Name & Email on Load
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        // 1. Auto-fill Email immediately
+        document.getElementById("email").value = user.email;
+
+        // 2. Fetch the Name (saved during signup) from Backend
+        try {
+            const token = await user.getIdToken();
+            const res = await fetch(`${BASE_URL}/api/auth/profile-data`, {
+                method: "GET",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            if(res.ok) {
+                const data = await res.json();
+                // If the name exists in DB, fill it!
+                if(data.name) {
+                    document.getElementById("name").value = data.name;
+                    // Optional: If you want to lock the name so they can't change it:
+                    // document.getElementById("name").readOnly = true; 
+                }
+            }
+        } catch(err) {
+            console.error("Error fetching name:", err);
+        }
+    } else {
+        // If not logged in, go back to login
+        window.location.href = "login.html";
+    }
+  });
+
+  // --- EXISTING SUBMIT LOGIC ---
   document.getElementById("profileForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const user = auth.currentUser;
-    if (!user) {
-      alert("You must be signed in!");
-      return;
-    }
+    if (!user) { alert("You must be signed in!"); return; }
 
-    // 1. Get the security token from Firebase
     const token = await user.getIdToken();
 
     const profileData = {
       name: document.getElementById("name").value,
       gender: document.getElementById("gender").value,
       dob: document.getElementById("dob").value,
+      bloodGroup: document.getElementById("bloodGroup").value,
       phone: document.getElementById("phone").value,
       taluka: document.getElementById("location").value
     };
 
     try {
-      // 2. Send data to your NODE SERVER (/api/auth/profile)
-     const response = await fetch(`${BASE_URL}/api/auth/profile`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify(profileData)
-});
+      const response = await fetch(`${BASE_URL}/api/auth/profile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(profileData)
+      });
 
-      // 3. Check if response is JSON (prevents the DOCTYPE error)
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         const result = await response.json();
         alert("Success: " + result.message);
         window.location.href = "dashboard.html"; 
       } else {
-        throw new Error("Server sent back HTML instead of JSON. Check your API route.");
+        throw new Error("Server Error");
       }
 
     } catch (err) {

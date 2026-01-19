@@ -4,9 +4,9 @@
   <title>Signup</title>
   <style>
     body {
-      background-color: #f0f8ff; /* Alice blue for a light blue background */
+      background-color: #f0f8ff;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #003366; /* Dark blue for text */
+      color: #003366;
       margin: 0;
       padding: 0;
       display: flex;
@@ -15,35 +15,36 @@
       height: 100vh;
     }
     .container {
-      background-color: #ffffff; /* White background for container */
+      background-color: #ffffff;
       padding: 40px;
       border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15); /* Subtle shadow with blue tint */
+      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15);
       width: 100%;
       max-width: 400px;
       text-align: center;
-      border: 1px solid #e0e0e0; /* Light border for professionalism */
+      border: 1px solid #e0e0e0;
     }
     h2 {
-      color: #003366; /* Dark blue for heading */
+      color: #003366;
       margin-bottom: 20px;
       font-weight: 600;
     }
     input {
-      border: 2px solid #b0c4de; /* Light steel blue border */
+      border: 2px solid #b0c4de;
       padding: 12px;
       margin: 10px 0;
       width: 100%;
       border-radius: 5px;
       font-size: 16px;
-      transition: border-color 0.3s ease; /* Smooth transition for focus */
+      transition: border-color 0.3s ease;
+      box-sizing: border-box; /* Fixes padding issues */
     }
     input:focus {
-      border-color: #4682b4; /* Steel blue on focus */
+      border-color: #4682b4;
       outline: none;
     }
     button {
-      background-color: #4682b4; /* Steel blue for button */
+      background-color: #4682b4;
       color: white;
       padding: 12px;
       border: none;
@@ -52,17 +53,17 @@
       cursor: pointer;
       font-size: 16px;
       font-weight: 500;
-      transition: background-color 0.3s ease; /* Smooth hover transition */
+      transition: background-color 0.3s ease;
     }
     button:hover {
-      background-color: #003366; /* Darker blue on hover */
+      background-color: #003366;
     }
     p {
       margin-top: 20px;
       font-size: 14px;
     }
     a {
-      color: #4682b4; /* Blue link */
+      color: #4682b4;
       text-decoration: none;
     }
     a:hover {
@@ -76,9 +77,14 @@
   <h2>Signup</h2>
 
   <form id="signupForm">
+    <input type="text" id="signup-name" placeholder="Full Name" required>
+    
     <input type="email" id="email" placeholder="Email" required>
     <input type="password" id="password" placeholder="Password" required>
     <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+    
+    <input type="hidden" id="signup-age"> 
+
     <button type="submit">Signup</button>
   </form>
 
@@ -88,24 +94,72 @@
   </p>
 </div>
 
-<!-- Firebase SDK -->
 <script type="module">
-  const BASE_URL = "https://hospital-appointment-system-oogs.onrender.com";
+ // AUTOMATICALLY DETECT ENVIRONMENT
+const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+const BASE_URL = isLocal 
+    ? "http://localhost:5000"                              // If on laptop, use Local Backend
+    : "https://hospital-appointment-system-oogs.onrender.com"; // If on web, use Live Render Backend
+  
+  // 1. Import Auth AND Firestore
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig = {
+  const firebaseConfig = {
     apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
     authDomain: "hospital-system-88ee9.firebaseapp.com",
     projectId: "hospital-system-88ee9",
     appId: "1:1052835799972:web:81b5f73457d76b777ad731"
   };
+
+  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app); // Initialize Database
 
+  // ==========================================
+  //  QR CODE DETECTION LOGIC (New Syntax)
+  // ==========================================
+  const urlParams = new URLSearchParams(window.location.search);
+  const legacyID = urlParams.get('legacyID');
+
+  if (legacyID) {
+    console.log("Found QR Code ID:", legacyID);
+    
+    // Fetch the "Old Paper Data" from Firestore
+    const docRef = doc(db, "legacy_records", legacyID);
+    
+    getDoc(docRef).then((docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            
+            // VISUAL MAGIC: Auto-fill the inputs!
+            if(document.getElementById('signup-name')) {
+                document.getElementById('signup-name').value = data.fullName;
+                // Make it read-only if you want to force them to use that name
+                // document.getElementById('signup-name').readOnly = true; 
+            }
+            if(document.getElementById('signup-age')) {
+                document.getElementById('signup-age').value = data.age; 
+            }
+            
+            // Show alert
+            alert(`🏥 Welcome back, ${data.fullName}! We found your hospital records. Create a password to claim them.`);
+        }
+    }).catch(error => {
+        console.error("Error finding records:", error);
+    });
+  }
+
+  // ==========================================
+  //  SIGNUP LOGIC
+  // ==========================================
   document.getElementById("signupForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const name = document.getElementById("signup-name").value; // Get the name!
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
@@ -122,15 +176,18 @@ const firebaseConfig = {
       // Get Firebase ID token
       const idToken = await user.getIdToken();
 
-      // Send token to backend
-     const res = await fetch(`${BASE_URL}/api/auth/init-user`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${idToken}`
-    },
-    body: JSON.stringify({ email })
-});
+      // Send token AND NAME to backend
+      const res = await fetch(`${BASE_URL}/api/auth/init-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${idToken}`
+        },
+        // We now send the name too, so the backend can save it!
+        body: JSON.stringify({ email: email, 
+      name: name,
+      legacyID: legacyID }) 
+      });
 
       const data = await res.json();
       alert(data.message);
@@ -143,7 +200,5 @@ const firebaseConfig = {
   });
 </script>
 
-
 </body>
 </html>
-

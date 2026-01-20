@@ -70,6 +70,11 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
+// 2. Doctor Portal Route: Direct access to dlogin.html
+app.get("/doctor", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "dlogin.html"));
+});
+
 /* ---------- 7. ERROR HANDLING MIDDLEWARE ---------- */
 // This catches any errors in auth.js and prints them in the terminal
 app.use((err, req, res, next) => {

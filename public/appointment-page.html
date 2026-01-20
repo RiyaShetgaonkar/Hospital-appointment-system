@@ -1,3 +1,9 @@
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,164 +14,26 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
-            font-family: 'Roboto', sans-serif;
-            color: #2c3e50;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            line-height: 1.6;
-        }
-        header {
-            background-color: #ffffff;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-bottom: 3px solid #3498db;
-        }
-        .logo-container {
-            display: flex;
-            align-items: center;
-        }
-        .logo-img {
-            width: 50px;
-            height: 50px;
-            margin-right: 15px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .logo {
-            font-size: 32px;
-            color: #2c3e50;
-            font-weight: 700;
-            font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
-        }
-        .main-body {
-            padding: 60px 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-            border: 1px solid #e1e8ed;
-            position: relative;
-            overflow: hidden;
-        }
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
-        }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 32px;
-            font-weight: 700;
-        }
-        p {
-            font-size: 16px;
-            color: #7f8c8d;
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            text-align: left;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        select {
-            border: 2px solid #b0c4de;
-            padding: 12px;
-            margin: 10px 0 20px;
-            width: 100%;
-            box-sizing: border-box;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            font-size: 16px;
-            color: #2c3e50;
-            transition: border-color 0.3s ease;
-        }
-        select:focus {
-            border-color: #3498db;
-            outline: none;
-        }
-        .back-button {
-            background-color: #3498db;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            text-decoration: none;
-            display: inline-block;
-            margin: 10px 5px;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-        .back-button:hover {
-            background-color: #2980b9;
-        }
-        #tokenBox {
-            font-size: 48px;
-            font-weight: bold;
-            color: #3498db;
-            margin: 20px 0;
-            border: 2px dashed #3498db;
-            padding: 15px;
-            border-radius: 12px;
-            background-color: #f1f8ff;
-        }
-        #etaBox {
-            font-size: 18px;
-            color: #e74c3c;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        #submit {
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            padding: 15px;
-            width: 100%;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-        #submit:disabled {
-            background-color: #bdc3c7;
-            cursor: not-allowed;
-        }
-        .info-text {
-            font-size: 14px;
-            color: #7f8c8d;
-            margin-bottom: 20px;
-        }
-        h3 {
-            color: #2c3e50;
-            font-size: 20px;
-            font-weight: 600;
-            margin: 20px 0 10px;
-        }
+        body { background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%); font-family: 'Roboto', sans-serif; color: #2c3e50; margin: 0; padding: 0; height: 100vh; line-height: 1.6; }
+        header { background-color: #ffffff; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-bottom: 3px solid #3498db; }
+        .logo-container { display: flex; align-items: center; }
+        .logo-img { width: 50px; height: 50px; margin-right: 15px; border-radius: 50%; object-fit: cover; }
+        .logo { font-size: 32px; color: #2c3e50; font-weight: 700; font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif; }
+        .main-body { padding: 60px 40px; display: flex; flex-direction: column; align-items: center; max-width: 1200px; margin: 0 auto; }
+        .container { background-color: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); width: 100%; max-width: 500px; text-align: center; border: 1px solid #e1e8ed; position: relative; overflow: hidden; }
+        .container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%); }
+        h1 { color: #2c3e50; margin-bottom: 10px; font-size: 32px; font-weight: 700; }
+        label { display: block; text-align: left; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
+        select { border: 2px solid #b0c4de; padding: 12px; margin: 10px 0 20px; width: 100%; border-radius: 8px; background-color: #f9f9f9; font-size: 16px; color: #2c3e50; }
+        .back-button { background-color: #3498db; color: white; padding: 12px 20px; border: none; border-radius: 8px; text-decoration: none; display: inline-block; margin: 10px 5px; font-weight: 500; cursor: pointer; }
+        #tokenBox { font-size: 48px; font-weight: bold; color: #3498db; margin: 20px 0; border: 2px dashed #3498db; padding: 15px; border-radius: 12px; background-color: #f1f8ff; }
+        #etaBox { font-size: 18px; color: #e74c3c; font-weight: bold; margin-bottom: 20px; }
+        #submit { background-color: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; }
+        #submit:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        #currentTokenBox { font-size: 16px; color: #2c3e50; font-weight: 500; margin: 20px 0; padding: 15px; border: 2px solid #3498db; border-radius: 8px; background-color: #f0faff; }
+        .time-warning { color: #d35400; font-weight: bold; font-size: 14px; margin-bottom: 10px; display: none; background: #fff3e0; padding: 10px; border-radius: 8px; }
+        #cancelBtn { background-color: #e74c3c; display: none; }
+        #cancelBtn:hover { background-color: #c0392b; }
     </style>
 </head>
 <body>
@@ -180,30 +48,29 @@
 <div class="main-body">
     <div class="container">
         <h1>Book Token</h1>
+        <div id="timeWarning" class="time-warning">⚠️ Booking for this clinic is CLOSED. (9AM-12PM & 2PM-5PM only)</div>
         <p><strong>Patient:</strong> <span id="patientName">Loading...</span></p>
 
         <label for="clinic">Select Clinic</label>
         <select id="clinic">
             <option value="">-- Choose Clinic --</option>
-            <option value="Dermatology">Dermatology</option>
+            <option value="Dermatology">Dermatology (Test Case - 24/7)</option>
             <option value="Orthopedics">Orthopedics</option>
             <option value="Cardiology">Cardiology</option>
             <option value="ENT">ENT</option>
         </select>
-
-        <div class="info-text">You will be notified via email when you are 3rd in line.</div>
 
         <button id="submit">Get Token</button>
 
         <h3>Your Assigned Token</h3>
         <div id="tokenBox">—</div>
 
-        <h3>Estimated Wait</h3>
-        <div id="etaBox">Select a clinic...</div>
+        <h3>Your Live Token Status</h3>
+        <div id="currentTokenBox">Searching for active tokens...</div>
 
         <div style="margin-top: 20px;">
+            <button id="cancelBtn" class="back-button">Cancel Token</button>
             <a href="dashboard.html" class="back-button">Dashboard</a>
-            <a href="doctor.html" class="back-button">Doctor Panel</a>
         </div>
     </div>
 </div>
@@ -217,7 +84,7 @@ const BASE_URL = isLocal
     ? "http://localhost:5000"                              // If on laptop, use Local Backend
     : "https://hospital-appointment-system-oogs.onrender.com"; // If on web, use Live Render Backend
     import { db, AVG_TIME } from "./app.js";
-    import { collection, addDoc, getDoc, doc, setDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { collection, addDoc, getDoc, doc, setDoc, serverTimestamp, onSnapshot, query, where, getDocs, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
     const auth = getAuth();
@@ -226,238 +93,167 @@ const BASE_URL = isLocal
     const tokenBox = document.getElementById("tokenBox");
     const patientNameUI = document.getElementById("patientName");
     const etaBox = document.getElementById("etaBox");
+    const currentTokenBox = document.getElementById("currentTokenBox");
+    const timeWarning = document.getElementById("timeWarning");
+    const cancelBtn = document.getElementById("cancelBtn");
 
     let firebaseUser = null;
     let userData = null;
-    let unsubscribe = null;
+    let queueUnsubscribe = null;
+    let statusUnsubscribe = null;
+    let activeTokens = {}; 
+    let currentPeopleAhead = null; // Used for the "2 people ahead" logic
 
-    /* 🔐 1. Auth Listener: Secure the Email from Firebase Auth */
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) { 
-            window.location.href = "index.html"; 
-            return; 
-        }
-        firebaseUser = user; // This object contains the verified email address
+    function isBookingAllowed(clinicName) {
+        if (clinicName === "Dermatology") return true;
+        const now = new Date();
+        const hrs = now.getHours();
+        return (hrs >= 9 && hrs < 12) || (hrs >= 14 && hrs < 17);
+    }
+
+    function refreshUI() {
+        const selectedClinic = clinicSelect.value;
+        const allowedTime = isBookingAllowed(selectedClinic);
         
-        const token = await user.getIdToken();
-        try {
-            const response = await fetch(`${BASE_URL}/api/auth/profile-data`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            userData = await response.json();
-            patientNameUI.textContent = userData.name || "User";
-        } catch(e) { 
-            console.error("Profile load fail", e); 
-        }
-    });
-
-    /* 🕒 2. Real-time Queue Updates */
-    clinicSelect.onchange = () => {
-        if (unsubscribe) unsubscribe();
-        const clinic = clinicSelect.value;
-        if (!clinic) { 
-            etaBox.textContent = "Select a clinic..."; 
-            return; 
-        }
-
-        const queueRef = collection(db, "queue", clinic, "patients");
-        unsubscribe = onSnapshot(queueRef, (snapshot) => {
-            const count = snapshot.size;
-            const waitTime = count * AVG_TIME;
-            etaBox.textContent = count === 0 ? "0 mins (Direct Entry)" : `~${waitTime} minutes (${count} in queue)`;
-            etaBox.style.color = count === 0 ? "green" : "#d9534f";
-        });
-    };
-
-    /* 📝 3. Booking Logic: Saves Email for the Gmail Relay */
-    submitBtn.onclick = async () => {
-        if (!firebaseUser || !userData) { 
-            alert("Waiting for profile data... please wait a moment."); 
-            return; 
-        }
-
-        if (!userData.phone || userData.phone === "6543456789" && !userData.name) {
-            alert("Please ensure your profile is complete before booking.");
-            return;
-        }
-
-        const clinic = clinicSelect.value;
-        if (!clinic) { 
-            alert("Please select a clinic"); 
-            return; 
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Processing...";
-
-        try {
-            // A. Get Token Sequence
-            const statusRef = doc(db, "clinic_status", clinic);
-            const statusSnap = await getDoc(statusRef);
-            
-            let lastTokenIssued = statusSnap.exists() ? Number(statusSnap.data().lastTokenIssued || 0) : 0;
-            let currentlyServing = statusSnap.exists() ? Number(statusSnap.data().currentlyServing || 0) : 0;
-
-            // B. Increment Token (1-50)
-            let tokenNumber = (lastTokenIssued % 50) + 1;
-
-            // C. Calculate Queue Position
-            let distance = tokenNumber - currentlyServing;
-            if (distance <= 0) distance += 50; 
-
-            // D. Save to Firestore Queue (THIS DATA FEEDS THE GMAIL SCRIPT)
-            await addDoc(collection(db, "queue", clinic, "patients"), {
-                uid: firebaseUser.uid,
-                name: userData.name || "Patient",
-                phone: userData.phone || "N/A",
-                email: firebaseUser.email, // 🔥 CRITICAL: Must be here for Gmail reminders
-                token: tokenNumber,
-                time: serverTimestamp()
-            });
-
-            // E. Update global counter
-            await setDoc(statusRef, { lastTokenIssued: tokenNumber }, { merge: true });
-
-            tokenBox.textContent = tokenNumber;
-
-            if (distance <= 3) {
-                alert(`Success! Token #${tokenNumber} issued. You are next or very close. Please wait at the clinic.`);
-            } else {
-                alert(`Success! Token #${tokenNumber} issued. We will email ${firebaseUser.email} when 3 patients are ahead of you.`);
-            }
-
-        } catch (error) {
-            console.error("Booking Error:", error);
-            alert("Could not book token: " + error.message);
-        } finally {
-            submitBtn.disabled = false;
+        if (selectedClinic && activeTokens[selectedClinic]) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Token Taken for " + selectedClinic;
+            submitBtn.style.backgroundColor = "#bdc3c7";
+            timeWarning.style.display = "none";
+            cancelBtn.style.display = "inline-block";
+        } else if (selectedClinic && !allowedTime) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Booking Closed";
+            submitBtn.style.backgroundColor = "#bdc3c7";
+            timeWarning.style.display = "block";
+            cancelBtn.style.display = "none";
+        } else {
+            submitBtn.disabled = !selectedClinic;
             submitBtn.textContent = "Get Token";
+            submitBtn.style.backgroundColor = "#27ae60";
+            timeWarning.style.display = "none";
+            cancelBtn.style.display = "none";
         }
-    };
-</script> -->
-<script type="module">
-    // 1. USE VERSION 10.7.1 (Matches your other files)
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDoc, doc, setDoc, serverTimestamp, onSnapshot } 
-        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    }
 
-    // 2. ENVIRONMENT DETECTION
-    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-    const BASE_URL = isLocal 
-        ? "http://localhost:5000" 
-        : "https://hospital-appointment-system-oogs.onrender.com";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
-        authDomain: "hospital-system-88ee9.firebaseapp.com",
-        projectId: "hospital-system-88ee9",
-        appId: "1:1052835799972:web:81b5f73457d76b777ad731"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app); // Initialize DB here directly
-
-    const AVG_TIME = 15; // Set average time manually since we removed app.js import
-    const clinicSelect = document.getElementById("clinic");
-    const submitBtn = document.getElementById("submit");
-    const tokenBox = document.getElementById("tokenBox");
-    const patientNameUI = document.getElementById("patientName");
-    const etaBox = document.getElementById("etaBox");
-
-    let firebaseUser = null;
-    let userData = null;
-    let unsubscribe = null;
-
-    /* 🔐 1. Auth Listener */
     onAuthStateChanged(auth, async (user) => {
-        if (!user) { 
-            window.location.href = "login.html"; // Redirect if not logged in
-            return; 
-        }
+        if (!user) { window.location.href = "login.html"; return; }
         firebaseUser = user;
-        console.log("Logged in as:", user.email);
-
-        // Fetch Name from Backend
         try {
             const token = await user.getIdToken();
             const response = await fetch(`${BASE_URL}/api/auth/profile-data`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            
-            if (response.ok) {
-                userData = await response.json();
-                // ✅ UPDATE THE NAME ON SCREEN
-                patientNameUI.textContent = userData.name || "Valued Patient";
-            }
-        } catch(e) { 
-            console.error("Profile load fail", e); 
-        }
+            userData = await response.json();
+            patientNameUI.textContent = userData.name || "User";
+            refreshUI();
+        } catch(e) { console.error("Session Error", e); }
     });
 
-    /* 🕒 2. Real-time Queue Updates */
     clinicSelect.onchange = () => {
-        if (unsubscribe) unsubscribe();
         const clinic = clinicSelect.value;
-        if (!clinic) { 
-            etaBox.textContent = "Select a clinic..."; 
-            return; 
+        if (queueUnsubscribe) queueUnsubscribe();
+        if (statusUnsubscribe) statusUnsubscribe();
+        
+        if (!clinic) {
+            etaBox.textContent = "Select a clinic...";
+            currentTokenBox.textContent = "Select a clinic to see status.";
+            tokenBox.textContent = "—";
+            refreshUI();
+            return;
         }
 
-        const queueRef = collection(db, "queue", clinic, "patients");
-        unsubscribe = onSnapshot(queueRef, (snapshot) => {
+        // Real-time Queue Size
+        queueUnsubscribe = onSnapshot(collection(db, "queue", clinic, "patients"), (snapshot) => {
             const count = snapshot.size;
-            const waitTime = count * AVG_TIME;
-            etaBox.textContent = count === 0 ? "0 mins (Direct Entry)" : `~${waitTime} minutes (${count} in queue)`;
-            etaBox.style.color = count === 0 ? "green" : "#d9534f";
+            etaBox.textContent = `Queue: ${count} patients (~${count * AVG_TIME} mins)`;
+        });
+
+        // 🔥 Rank-Based Listener (Handles the "Estimated Time Effect" of cancellations)
+        const q = query(collection(db, "queue", clinic, "patients"), orderBy("time", "asc"));
+        
+        statusUnsubscribe = onSnapshot(q, (snapshot) => {
+            const allPatients = snapshot.docs;
+            const myIndex = allPatients.findIndex(d => d.data().uid === firebaseUser.uid);
+
+            if (myIndex !== -1) {
+                const data = allPatients[myIndex].data();
+                activeTokens[clinic] = data.token;
+                currentPeopleAhead = myIndex; // 0 means you are next
+
+                const wait = currentPeopleAhead * AVG_TIME;
+                currentTokenBox.innerHTML = `
+                    <div style="color: #3498db; font-weight: bold;">YOUR ${clinic.toUpperCase()} TOKEN</div>
+                    <strong>Token:</strong> #${data.token}<br>
+                    <strong>Status:</strong> ${currentPeopleAhead === 0 ? "You're Next!" : currentPeopleAhead + " ahead"}<br>
+                    <span style="color: #27ae60;"><strong>Adjusted Wait:</strong> ~${wait} mins</span>
+                `;
+                tokenBox.textContent = data.token;
+                refreshUI();
+            } else {
+                delete activeTokens[clinic];
+                currentPeopleAhead = null;
+                currentTokenBox.textContent = `No active token for ${clinic}.`;
+                tokenBox.textContent = "—";
+                refreshUI();
+            }
         });
     };
 
-    /* 📝 3. Booking Logic */
     submitBtn.onclick = async () => {
-        if (!firebaseUser) { alert("Please login first."); return; }
-        
         const clinic = clinicSelect.value;
-        if (!clinic) { alert("Please select a clinic"); return; }
+        if (!isBookingAllowed(clinic)) { alert("Clinic closed."); return; }
+        if (activeTokens[clinic]) return;
 
         submitBtn.disabled = true;
-        submitBtn.textContent = "Processing...";
-
         try {
             const statusRef = doc(db, "clinic_status", clinic);
             const statusSnap = await getDoc(statusRef);
-            
-            let lastTokenIssued = statusSnap.exists() ? Number(statusSnap.data().lastTokenIssued || 0) : 0;
-            let currentlyServing = statusSnap.exists() ? Number(statusSnap.data().currentlyServing || 0) : 0;
+            let lastToken = statusSnap.exists() ? Number(statusSnap.data().lastTokenIssued || 0) : 0;
+            let tokenNumber = (lastToken % 50) + 1;
 
-            let tokenNumber = (lastTokenIssued % 50) + 1;
-
-            // Save to Firestore
             await addDoc(collection(db, "queue", clinic, "patients"), {
                 uid: firebaseUser.uid,
-                name: userData?.name || "Patient",
-                phone: userData?.phone || "N/A",
-                email: firebaseUser.email, 
+                name: userData.name || "Patient",
+                phone: userData.phone || "N/A",
+                email: firebaseUser.email,
                 token: tokenNumber,
                 time: serverTimestamp()
             });
 
-            // Update Counter
             await setDoc(statusRef, { lastTokenIssued: tokenNumber }, { merge: true });
+        } catch (e) { alert("Error: " + e.message); refreshUI(); }
+    };
 
-            tokenBox.textContent = tokenNumber;
-            alert(`Success! Token #${tokenNumber} issued.`);
+    /* 🗑️ Smart Cancellation Logic */
+    cancelBtn.onclick = async () => {
+        const clinic = clinicSelect.value;
+        
+        // Block if less than 2 people are ahead (currentPeopleAhead is 0 or 1)
+        if (currentPeopleAhead !== null && currentPeopleAhead < 2) {
+            alert("Cancellation failed: You are already next in line or currently being called.");
+            return;
+        }
 
-        } catch (error) {
-            console.error("Booking Error:", error);
-            alert("Error: " + error.message);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Get Token";
+        const confirmCancel = confirm(`You have ${currentPeopleAhead} people ahead. Are you sure you want to cancel? This will instantly move everyone behind you up in the queue.`);
+        
+        if (confirmCancel) {
+            cancelBtn.disabled = true;
+            try {
+                const q = query(collection(db, "queue", clinic, "patients"), where("uid", "==", firebaseUser.uid));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    await deleteDoc(snap.docs[0].ref);
+                    alert("Token cancelled. Wait times for other patients have been updated.");
+                }
+            } catch (e) { alert("Error: " + e.message); }
+            finally { cancelBtn.disabled = false; refreshUI(); }
         }
     };
-</script>
 
+    setInterval(refreshUI, 60000); 
+</script>
 </body>
 </html>
+
+

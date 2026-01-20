@@ -1,198 +1,298 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Login</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
-      font-family: 'Roboto', sans-serif;
-      color: #2c3e50;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      line-height: 1.6;
-    }
-    header {
-      background-color: #ffffff;
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border-bottom: 3px solid #3498db;
-    }
-    .logo-container {
-      display: flex;
-      align-items: center;
-    }
-    .logo-img {
-      width: 50px;
-      height: 50px;
-      margin-right: 15px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .logo {
-      font-size: 32px;
-      color: #2c3e50;
-      font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
-      font-weight: 700;
-    }
-    .main-body {
-      padding: 60px 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .container {
-      background-color: #ffffff;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 500px;
-      text-align: center;
-      border: 1px solid #e1e8ed;
-      position: relative;
-      overflow: hidden;
-    }
-    .container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
-    }
-    h2 {
-      color: #2c3e50;
-      margin-bottom: 20px;
-      font-size: 28px;
-      font-weight: 700;
-    }
-    input[type="email"], input[type="password"] {
-      border: 2px solid #b0c4de;
-      padding: 12px;
-      margin: 10px 0;
-      width: 100%;
-      box-sizing: border-box;
-      border-radius: 8px;
-      font-size: 16px;
-      transition: border-color 0.3s ease;
-    }
-    input[type="email"]:focus, input[type="password"]:focus {
-      border-color: #3498db;
-      outline: none;
-      box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-    }
-    button {
-      background-color: #3498db;
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      width: 100%;
-      margin-top: 10px;
-      font-weight: 500;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #2980b9;
-    }
-    p {
-      color: #2c3e50;
-      margin-top: 20px;
-      font-size: 14px;
-    }
-    a {
-      color: #3498db;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Care Connect - Hospital Appointment Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-bottom: 3px solid #3498db;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .logo {
+            font-size: 32px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+        .auth-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .auth-btn:hover {
+            background-color: #2980b9;
+        }
+        .hero {
+            text-align: center;
+            padding: 100px 20px;
+            background: linear-gradient(135deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
+            color: white;
+        }
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .cta-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .cta-btn:hover {
+            background-color: #27ae60;
+        }
+        .features {
+            padding: 60px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .features h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 40px;
+            color: #2c3e50;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 1px solid #e1e8ed;
+        }
+        .feature-card i {
+            font-size: 48px;
+            color: #3498db;
+            margin-bottom: 20px;
+        }
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .feature-card p {
+            color: #666;
+        }
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 60px;
+        }
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            position: relative;
+        }
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .modal-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            width: 120px;
+            transition: 0.3s;
+        }
+        .modal-btn:hover {
+            background-color: #2980b9;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        .close-btn:hover {
+            color: #333;
+        }
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            .hero p {
+                font-size: 18px;
+            }
+            .features h2 {
+                font-size: 28px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <header>
+        <div class="logo-container">
+            <img src="logo.jpeg" alt="Logo" class="logo-img">
+            <div class="logo">Care Connect</div>
+        </div>
+        <button class="auth-btn" id="authBtn">Sign Up / Log In</button>
+    </header>
 
-<header>
-  <div class="logo-container">
-    <img src="logo.jpeg" alt="Care Connect Logo" class="logo-img">
-    <div class="logo">Care Connect</div>
-  </div>
-</header>
+    <section class="hero">
+        <h1>Welcome to Care Connect</h1>
+        <p>This website is a real-time hospital and clinic appointment management system designed to replace traditional physical queues with a digital token-based queue. Patients can book appointments online, receive a token, track their live position in the queue, view estimated waiting time, and cancel if needed. Doctors can monitor the live queue, call the next patient, view patient details and medical history, and manage the flow efficiently. The system uses real-time updates to ensure both patients and doctors always see the latest queue status, reducing waiting time, crowding, and improving overall clinic efficiency.</p>
+        <button class="cta-btn" onclick="alert('Learn More or Get Started')">Get Started</button>
+    </section>
 
-<div class="main-body">
-  <div class="container">
-    <h2>Login</h2>
-    <form id="loginForm">
-      <input type="email" id="email" placeholder="Email" required><br><br>
-      <input type="password" id="password" placeholder="Password" required><br><br>
-      <button type="submit">Login</button>
-    </form>
-    <p>Don't have an account? <a href="signup.html">Signup</a></p>
-  </div>
-</div>
+    <section class="features">
+        <h2>Key Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <i class="fas fa-calendar-check"></i>
+                <h3>Online Booking</h3>
+                <p>Patients can easily book appointments online and receive a unique digital token instantly.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-clock"></i>
+                <h3>Live Queue Tracking</h3>
+                <p>Track your position in the queue in real-time and view estimated waiting times.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-user-md"></i>
+                <h3>Doctor Dashboard</h3>
+                <p>Doctors can monitor the queue, call patients, and access medical histories seamlessly.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-sync-alt"></i>
+                <h3>Real-Time Updates</h3>
+                <p>Instant notifications and updates ensure everyone stays informed without delays.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-times-circle"></i>
+                <h3>Easy Cancellation</h3>
+                <p>Cancel appointments effortlessly if plans change, freeing up slots for others.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Improved Efficiency</h3>
+                <p>Reduce crowding and waiting times, making clinics more efficient and patient-friendly.</p>
+            </div>
+        </div>
+    </section>
 
-<script type="module">
-  // AUTOMATICALLY DETECT ENVIRONMENT
-const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    <footer>
+        <p>&copy; 2023 Care Connect. All rights reserved. | Transforming Healthcare with Digital Queues</p>
+    </footer>
 
-const BASE_URL = isLocal 
-    ? "http://localhost:5000"                              // If on laptop, use Local Backend
-    : "https://hospital-appointment-system-oogs.onrender.com"; // If on web, use Live Render Backend
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    <!-- Modal for Sign Up / Log In Selection -->
+    <div id="authModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeAuthModal()">&times;</button>
+            <h3>Select Your Role</h3>
+            <button class="modal-btn" onclick="selectRole('user')">I am a User</button>
+            <button class="modal-btn" onclick="selectRole('hospital')">I am a Hospital</button>
+        </div>
+    </div>
 
+    <script>
+        // Modal functionality
+        const authModal = document.getElementById('authModal');
+        const authBtn = document.getElementById('authBtn');
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
-    authDomain: "hospital-system-88ee9.firebaseapp.com",
-    projectId: "hospital-system-88ee9",
-    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
-  };
+        authBtn.onclick = () => {
+            authModal.style.display = 'flex';
+        };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+        function closeAuthModal() {
+            authModal.style.display = 'none';
+        }
 
-  document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+        function selectRole(role) {
+            if (role === 'user') {
+                window.location.href = 'login.html';  // Redirect to login.html for users
+            } else if (role === 'hospital') {
+                window.location.href = 'dlogin.html';
+                // Add actual redirect logic here, e.g., window.location.href = '/hospital-login';
+            }
+            closeAuthModal();
+        }
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    try {
-      // Authenticate with Firebase
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Get token to notify our backend
-      const token = await user.getIdToken();
-      
-      // Initialize user in our Firestore via Node backend
-  await fetch(`${BASE_URL}/api/auth/init-user`, {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${token}` }
-});
-
-      alert("Login successful!");
-      window.location.href = "dashboard.html";
-    } catch (error) {
-      console.error(error);
-      alert("Login failed: " + error.message);
-    }
-  });
-</script>
-
+        // Close modal if clicked outside
+        window.onclick = (event) => {
+            if (event.target === authModal) {
+                closeAuthModal();
+            }
+        };
+    </script>
 </body>
 </html>

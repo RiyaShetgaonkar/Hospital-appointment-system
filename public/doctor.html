@@ -101,9 +101,6 @@
     import { collection, getDocs, deleteDoc, query, orderBy, onSnapshot, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-    const BASE_URL = isLocal ? "http://localhost:5000" : "https://hospital-appointment-system-oogs.onrender.com";
-
     const auth = getAuth();
     const clinicSelect = document.getElementById("clinicSelect");
     const queueList = document.getElementById("queueList");
@@ -120,52 +117,35 @@
     let currentDocName = "Dr. On Duty";
 
     onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            window.location.href = "login.html";
-            return;
-        }
-
+        if (!user) { window.location.href = "login.html"; return; }
         try {
             const docSnap = await getDoc(doc(db, "doctors", user.uid));
-            
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 currentDocName = data.name || "Dr. On Duty";
                 doctorWelcome.textContent = `Welcome, ${currentDocName}`;
                 clinicHeader.textContent = `${data.clinic} Panel`;
-                
                 clinicSelect.value = data.clinic;
                 startQueueListener(data.clinic);
             } else {
-                alert("Institutional Access Only. Please login via the Doctor Portal.");
-                await signOut(auth);
-                window.location.href = "dlogin.html";
+                alert("Access Denied"); signOut(auth); window.location.href = "dlogin.html";
             }
-        } catch (error) {
-            console.error("Auth verification error:", error);
-            window.location.href = "dlogin.html";
-        }
+        } catch (error) { console.error(error); }
     });
 
-    document.getElementById("logoutBtn").onclick = () => {
-        signOut(auth).then(() => window.location.href = "dlogin.html");
-    };
+    document.getElementById("logoutBtn").onclick = () => signOut(auth).then(() => window.location.href = "dlogin.html");
 
     function startQueueListener(clinic) {
         if (unsubscribe) unsubscribe();
         queueRef = collection(db, "queue", clinic, "patients");
         const q = query(queueRef, orderBy("time", "asc"));
-
         unsubscribe = onSnapshot(q, (snapshot) => {
             queueList.innerHTML = "";
             let count = 0;
             snapshot.forEach((docSnap) => {
                 const d = docSnap.data();
                 const li = document.createElement("li");
-                li.innerHTML = `
-                    <span>Token <strong>#${d.token}</strong> - ${d.name}</span>
-                    <button class="view-btn" onclick="window.viewPatientDetails('${d.uid}')">View</button>
-                `;
+                li.innerHTML = `<span>Token <strong>#${d.token}</strong> - ${d.name}</span> <button class="view-btn" onclick="window.viewPatientDetails('${d.uid}')">View</button>`;
                 queueList.appendChild(li);
                 count++;
             });
@@ -173,69 +153,19 @@
         });
     }
 
-    /** * --- LOGIC: CALL NEXT & NOTIFY 3rd IN LINE ---
-     * 1. Serves index [0].
-     * 2. After [0] is called, index [3] becomes the 'New 3rd'.
-     * 3. Sends alert to index [3] ONLY if they haven't been notified yet.
-     */
     nextBtn.onclick = async () => {
         const clinic = clinicSelect.value;
         if (!clinic || !queueRef) return;
-
-        // Fetch the most recent list of waiting patients
         const q = query(queueRef, orderBy("time", "asc"));
         const snap = await getDocs(q);
+        if (snap.empty) { currentBox.textContent = "None"; viewCurrentBtn.style.display = "none"; return; }
 
-        if (snap.empty) {
-            currentBox.textContent = "None";
-            viewCurrentBtn.style.display = "none";
-            return;
-        }
-
-        // 1. Handle Patient currently being called (index 0)
         const firstDoc = snap.docs[0];
         const currentServingData = firstDoc.data();
-
         currentBox.innerHTML = `Token #${currentServingData.token}<br><small>${currentServingData.name}</small>`;
         viewCurrentBtn.style.display = "inline-block";
         viewCurrentBtn.onclick = () => window.viewPatientDetails(currentServingData.uid);
 
-        // 2. --- SMART ONE-TIME ALERT LOGIC ---
-        // If we have at least 4 people (0, 1, 2, 3)
-        // [0] is exiting the queue. [1, 2, 3] move up.
-        // The person at index [3] becomes the new 3rd person in line.
-        if (snap.docs.length >= 4) {
-            const luckyDoc = snap.docs[3]; 
-            const p = luckyDoc.data();
-
-            // ONLY send if they haven't been marked 'notified' in Firestore
-            if (!p.notified) {
-                console.log(`Movement detected: ${p.name} is now 3rd in line. Alerting...`);
-
-                fetch(`${BASE_URL}/api/auth/trigger-instant-relay`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        phone: p.phone, 
-                        userName: p.name, 
-                        clinicName: clinic, 
-                        tokenNumber: p.token, 
-                        email: p.email 
-                    })
-                }).then(async () => {
-                    // Update Firestore so they don't get double-notified when moving to 2nd or 1st
-                    await updateDoc(luckyDoc.ref, { notified: true });
-                    
-                    statusMsg.textContent = `Alert: ${p.name} notified as 3rd in line.`;
-                    statusMsg.style.display = "block";
-                    setTimeout(() => statusMsg.style.display = "none", 3000);
-                }).catch(err => console.error("Relay trigger failed:", err));
-            } else {
-                console.log(`${p.name} already notified. Skipping duplicate alert.`);
-            }
-        }
-
-        // 3. Update Clinic status and Delete the patient from the queue
         await setDoc(doc(db, "clinic_status", clinic), { currentlyServing: currentServingData.token }, { merge: true });
         await deleteDoc(firstDoc.ref);
     };
@@ -249,10 +179,12 @@
         const docSnap = await getDoc(doc(db, "users", patientId));
         if (docSnap.exists()) {
             const data = docSnap.data();
-            let historyHtml = (data.medicalHistory || []).map(h => `
+            
+            // 👀 SMART VIEW: Shows records even if saved with old names
+            let historyHtml = (data.medicalHistory || []).slice().reverse().map(h => `
                 <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
                     <strong>${h.date}</strong>: ${h.diagnosis} <br>
-                    <small>💊 Rx: ${h.prescription} | ${h.doctor || 'Unknown'}</small>
+                    <small>💊 Rx: ${h.medication || h.prescription || "None"} | ${h.department || h.doctor || "General"}</small>
                 </div>
             `).join('') || '<p>No previous history.</p>';
 
@@ -262,13 +194,11 @@
                     <button onclick="closeModal()" style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
                 </div>
                 <p>Blood Group: <strong>${data.bloodGroup || 'N/A'}</strong></p>
-                <hr>
-                <div style="max-height: 200px; overflow-y: auto;">${historyHtml}</div>
-                <hr>
+                <hr><div style="max-height: 200px; overflow-y: auto;">${historyHtml}</div><hr>
                 <div class="consultation-form">
-                    <input type="text" id="doc-diagnosis" placeholder="Diagnosis">
-                    <input type="text" id="doc-prescription" placeholder="Prescription">
-                    <button onclick="updatePatientRecord('${patientId}')" style="width:100%; background:#27ae60; color:white; border:none; padding:12px; border-radius:6px; cursor:pointer; font-weight:bold;">Complete Visit</button>
+                    <label>Diagnosis</label><input type="text" id="doc-diagnosis" placeholder="e.g. Viral Fever">
+                    <label>Medication</label><input type="text" id="doc-prescription" placeholder="e.g. Paracetamol">
+                    <button onclick="updatePatientRecord('${patientId}')" style="width:100%; background:#27ae60; color:white; border:none; padding:12px; border-radius:6px; cursor:pointer; font-weight:bold;">✅ Save & Complete Visit</button>
                 </div>
             `;
         }
@@ -276,16 +206,20 @@
 
     window.closeModal = () => document.getElementById("modalOverlay").style.display = "none";
 
+    // 💾 SAVE FUNCTION (Writes correct fields)
     window.updatePatientRecord = async (patientId) => {
         const diag = document.getElementById("doc-diagnosis").value;
         const presc = document.getElementById("doc-prescription").value;
+        const clinicName = document.getElementById("clinicSelect").value; 
+
         if (!diag) return alert("Enter Diagnosis");
 
         const visit = {
-            date: new Date().toISOString().split('T')[0],
+            date: new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }),
             diagnosis: diag,
-            prescription: presc || "None",
-            doctor: currentDocName
+            medication: presc || "None", // Saves as 'medication'
+            department: clinicName || "General", // Saves as 'department'
+            doctor: currentDocName 
         };
 
         await updateDoc(doc(db, "users", patientId), { medicalHistory: arrayUnion(visit) });

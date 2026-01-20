@@ -646,7 +646,6 @@ const BASE_URL = isLocal
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // AUTOMATICALLY DETECT ENVIRONMENT
   const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
   
   const firebaseConfig = {
@@ -660,41 +659,28 @@ const BASE_URL = isLocal
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Prevent back button navigation
+  // Auth & Navigation
   window.history.pushState(null, null, window.location.href);
-  window.addEventListener('popstate', () => {
-    window.history.pushState(null, null, window.location.href);
-  });
+  window.addEventListener('popstate', () => window.history.pushState(null, null, window.location.href));
 
-  // Auth Listener
   onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location.href = "index.html";
-    } else {
-      console.log("Logged in:", user.email);
-      listenToHistory(user.uid); // Load Data
-    }
+    if (!user) window.location.href = "index.html";
+    else listenToHistory(user.uid);
   });
 
-  // Dropdown Logic
-  const profile = document.getElementById('profile');
-  const dropdown = document.getElementById('dropdown');
-  profile.addEventListener('click', () => {
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-  });
-  window.addEventListener('click', (e) => {
-    if (!profile.contains(e.target)) dropdown.style.display = 'none';
-  });
-
-  // Logout Logic
   document.getElementById('logoutBtn').addEventListener('click', async (e) => {
     e.preventDefault();
     await signOut(auth);
     window.location.replace("index.html");
   });
 
+  const profile = document.getElementById('profile');
+  const dropdown = document.getElementById('dropdown');
+  profile.addEventListener('click', () => dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block');
+  window.addEventListener('click', (e) => { if (!profile.contains(e.target)) dropdown.style.display = 'none'; });
+
   /* ------------------------------------------------
-     🔥 HISTORY LISTENER (Updated for your DB Fields)
+     🔥 STRICT STANDARD LISTENER (New Format Only)
      ------------------------------------------------ */
   function listenToHistory(uid) {
     const historyContainer = document.getElementById('medical-history-list');
@@ -702,30 +688,29 @@ const BASE_URL = isLocal
     onSnapshot(doc(db, "users", uid), (docSnap) => {
         if (docSnap.exists() && docSnap.data().medicalHistory && docSnap.data().medicalHistory.length > 0) {
             
-            // Get history array
-            const history = docSnap.data().medicalHistory.reverse();
-            
-            // Clear Loading text
+            // Get history array and reverse it (Newest First)
+            const history = docSnap.data().medicalHistory.slice().reverse();
             historyContainer.innerHTML = "";
 
             history.forEach(h => {
-                // 📅 DATE FIX: Convert Firestore Timestamp to readable text
+                // 1. DATE FIX
                 let dateString = "Unknown Date";
                 if(h.date && h.date.seconds) {
-                    // It is a Firestore Timestamp
-                    dateString = new Date(h.date.seconds * 1000).toLocaleDateString("en-US", { 
-                        year: 'numeric', month: 'long', day: 'numeric' 
-                    });
+                    dateString = new Date(h.date.seconds * 1000).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
                 } else if (h.date) {
-                    // It is already a string
                     dateString = h.date;
                 }
 
-                // 🏥 HTML GENERATION
+                // 2. 🛑 STRICT CHECK: Only looks for 'medication' and 'department'
+                // It intentionally IGNORES 'prescription' and 'doctor'
+                const medicine = h.medication || "None";
+                const clinic = h.department || "General Clinic";
+
+                // 3. GENERATE CARD
                 const card = `
                     <div class="history-card">
                         <div class="history-header">
-                            <div class="clinic-name">🏥 ${h.department || "General Clinic"}</div>
+                            <div class="clinic-name">🏥 ${clinic}</div>
                             <div class="record-date">${dateString}</div>
                         </div>
                         <div class="history-details">
@@ -735,7 +720,7 @@ const BASE_URL = isLocal
                             </div>
                             <div class="detail-item">
                                 <strong>Medication</strong>
-                                <span class="rx-badge">💊 ${h.medication || "None"}</span>
+                                <span class="rx-badge">💊 ${medicine}</span>
                             </div>
                         </div>
                     </div>
@@ -744,13 +729,7 @@ const BASE_URL = isLocal
             });
 
         } else {
-            historyContainer.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-folder"></i>
-                    <p>No medical records found.</p>
-                    <small>Scan your QR code to sync old hospital files.</small>
-                </div>
-            `;
+            historyContainer.innerHTML = `<div class="empty-state"><i class="fas fa-folder"></i><p>No medical records found.</p></div>`;
         }
     });
   }

@@ -254,7 +254,7 @@ window.addEventListener('popstate', () => {
 
 </body>
 </html> -->
-
+<!-- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -402,6 +402,13 @@ window.addEventListener('popstate', () => {
   // ✅ NEW: Import Firestore functions
   import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+  // AUTOMATICALLY DETECT ENVIRONMENT
+const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+const BASE_URL = isLocal 
+    ? "http://localhost:5000"                              // If on laptop, use Local Backend
+    : "https://hospital-appointment-system-oogs.onrender.com"; // If on web, use Live Render Backend
+
   const firebaseConfig = {
     apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
     authDomain: "hospital-system-88ee9.firebaseapp.com",
@@ -422,7 +429,7 @@ window.addEventListener('popstate', () => {
   // Auth Listener
   onAuthStateChanged(auth, (user) => {
     if (!user) {
-      window.location.href = "login.html";
+      window.location.href = "index.html";
     } else {
       // ✅ CALL THE LISTENER WHEN USER LOGS IN
       listenToHistory(user.uid);
@@ -478,6 +485,268 @@ window.addEventListener('popstate', () => {
             historyContainer.innerHTML = `
                 <div style="text-align: center; padding: 20px; color: #888;">
                     <i class="fas fa-folder-open" style="font-size: 40px; color: #ddd; margin-bottom: 10px;"></i>
+                    <p>No medical records found.</p>
+                    <small>Scan your QR code to sync old hospital files.</small>
+                </div>
+            `;
+        }
+    });
+  }
+</script>
+
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Care Connect - Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
+      font-family: 'Roboto', sans-serif;
+      color: #2c3e50;
+      margin: 0; padding: 0; min-height: 100vh; line-height: 1.6;
+    }
+    header {
+      background-color: #ffffff; padding: 20px 40px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-bottom: 3px solid #3498db;
+    }
+    .logo-container { display: flex; align-items: center; }
+    .logo-img { width: 50px; height: 50px; margin-right: 15px; border-radius: 50%; object-fit: cover; }
+    .logo { font-size: 32px; color: #2c3e50; font-weight: 700; font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif; }
+    
+    .profile { position: relative; cursor: pointer; }
+    .profile i {
+      font-size: 35px; color: #3498db; border: 3px solid #3498db;
+      border-radius: 50%; padding: 5px; background-color: #ffffff; transition: all 0.3s ease;
+    }
+    .profile i:hover { transform: scale(1.05); }
+    
+    .dropdown {
+      display: none; position: absolute; right: 0; top: 50px;
+      background-color: #ffffff; border: 2px solid #3498db; border-radius: 8px;
+      min-width: 180px; z-index: 100; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+    .dropdown a {
+      color: #2c3e50; padding: 12px 16px; text-decoration: none; display: block;
+      font-size: 16px; font-weight: 500; transition: background-color 0.3s ease;
+    }
+    .dropdown a:hover { background-color: #ecf0f1; }
+
+    .main-body {
+      padding: 40px; display: flex; flex-direction: column; align-items: center;
+      max-width: 1000px; margin: 0 auto;
+    }
+    .welcome { text-align: center; margin-bottom: 30px; }
+    .welcome h1 { font-size: 32px; font-weight: 700; color: #2c3e50; }
+    .welcome p { font-size: 16px; color: #7f8c8d; }
+
+    /* --- HOSPITAL CARD --- */
+    .hospitals-grid { width: 100%; margin-bottom: 40px; }
+    .hospital-card {
+      background: white; border: 1px solid #e1e8ed; border-radius: 12px; padding: 25px;
+      cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      display: flex; align-items: center; position: relative; overflow: hidden;
+    }
+    .hospital-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+      background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
+    }
+    .hospital-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    .hospital-card i { font-size: 40px; color: #3498db; margin-right: 20px; }
+    
+    /* --- 📂 DIGITAL RECORDS STYLES --- */
+    #medical-history-container {
+      width: 100%; background: white; padding: 30px;
+      border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    /* THE CARD STYLE */
+    .history-card {
+        border: 1px solid #e1e4e8; border-left: 5px solid #3498db;
+        border-radius: 8px; padding: 20px; margin-bottom: 15px;
+        background-color: #fafbfc; display: flex; flex-direction: column;
+    }
+    .history-header {
+        display: flex; justify-content: space-between; margin-bottom: 12px;
+        border-bottom: 1px solid #eee; padding-bottom: 8px;
+    }
+    .clinic-name { font-weight: bold; font-size: 18px; color: #2c3e50; }
+    .record-date { color: #829ab1; font-size: 14px; font-weight: 500; }
+    
+    .history-details {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+    }
+    .detail-item strong { 
+        color: #7f8c8d; display: block; font-size: 12px; 
+        text-transform: uppercase; margin-bottom: 4px;
+    }
+    .detail-item span { color: #2c3e50; font-weight: 500; font-size: 15px;}
+    .rx-badge {
+        color: #e74c3c; font-weight: bold;
+    }
+
+    .empty-state {
+        text-align: center; padding: 40px; color: #829ab1;
+    }
+    .empty-state i { font-size: 48px; margin-bottom: 10px; color: #d9e2ec; }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo-container">
+    <img src="logo.jpeg" alt="Care Connect Logo" class="logo-img">
+    <div class="logo">Care Connect</div>
+  </div>
+  <div class="profile" id="profile">
+    <i class="fas fa-user-circle"></i>
+    <div class="dropdown" id="dropdown">
+      <a href="viewdetails.html"><i class="fas fa-user"></i> View My Details</a>
+      <a href="change-details.html"><i class="fas fa-edit"></i> Edit My Details</a>
+      <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+    </div>
+  </div>
+</header>
+
+<div class="main-body">
+  <div class="welcome">
+    <h1>Welcome to Care Connect</h1>
+    <p>Your gateway to quality healthcare in Goa. Connect with reliable providers.</p>
+  </div>
+
+  <div class="hospitals-grid">
+    <div class="hospital-card" onclick="window.location.href='appointment-page.html'">
+      <i class="fas fa-hospital"></i>
+      <div class="content">
+        <h3>Goa Medical College (GMC)</h3>
+        <p>Bambolim, Central Goa</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="medical-history-container">
+    <h2 style="color: #2c3e50; margin-top:0; margin-bottom: 20px;">
+      <i class="fas fa-folder-open" style="color:#f39c12;"></i> My Digital Records
+    </h2>
+    
+    <div id="medical-history-list">
+      <p style="text-align:center;">Loading your records...</p>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // AUTOMATICALLY DETECT ENVIRONMENT
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  
+  const firebaseConfig = {
+    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
+    authDomain: "hospital-system-88ee9.firebaseapp.com",
+    projectId: "hospital-system-88ee9",
+    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Prevent back button navigation
+  window.history.pushState(null, null, window.location.href);
+  window.addEventListener('popstate', () => {
+    window.history.pushState(null, null, window.location.href);
+  });
+
+  // Auth Listener
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "index.html";
+    } else {
+      console.log("Logged in:", user.email);
+      listenToHistory(user.uid); // Load Data
+    }
+  });
+
+  // Dropdown Logic
+  const profile = document.getElementById('profile');
+  const dropdown = document.getElementById('dropdown');
+  profile.addEventListener('click', () => {
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  });
+  window.addEventListener('click', (e) => {
+    if (!profile.contains(e.target)) dropdown.style.display = 'none';
+  });
+
+  // Logout Logic
+  document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    await signOut(auth);
+    window.location.replace("index.html");
+  });
+
+  /* ------------------------------------------------
+     🔥 HISTORY LISTENER (Updated for your DB Fields)
+     ------------------------------------------------ */
+  function listenToHistory(uid) {
+    const historyContainer = document.getElementById('medical-history-list');
+
+    onSnapshot(doc(db, "users", uid), (docSnap) => {
+        if (docSnap.exists() && docSnap.data().medicalHistory && docSnap.data().medicalHistory.length > 0) {
+            
+            // Get history array
+            const history = docSnap.data().medicalHistory.reverse();
+            
+            // Clear Loading text
+            historyContainer.innerHTML = "";
+
+            history.forEach(h => {
+                // 📅 DATE FIX: Convert Firestore Timestamp to readable text
+                let dateString = "Unknown Date";
+                if(h.date && h.date.seconds) {
+                    // It is a Firestore Timestamp
+                    dateString = new Date(h.date.seconds * 1000).toLocaleDateString("en-US", { 
+                        year: 'numeric', month: 'long', day: 'numeric' 
+                    });
+                } else if (h.date) {
+                    // It is already a string
+                    dateString = h.date;
+                }
+
+                // 🏥 HTML GENERATION
+                const card = `
+                    <div class="history-card">
+                        <div class="history-header">
+                            <div class="clinic-name">🏥 ${h.department || "General Clinic"}</div>
+                            <div class="record-date">${dateString}</div>
+                        </div>
+                        <div class="history-details">
+                            <div class="detail-item">
+                                <strong>Diagnosis</strong>
+                                <span>${h.diagnosis || "N/A"}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Medication</strong>
+                                <span class="rx-badge">💊 ${h.medication || "None"}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                historyContainer.innerHTML += card;
+            });
+
+        } else {
+            historyContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-folder"></i>
                     <p>No medical records found.</p>
                     <small>Scan your QR code to sync old hospital files.</small>
                 </div>

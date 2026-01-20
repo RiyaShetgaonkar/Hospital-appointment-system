@@ -92,7 +92,7 @@ router.post("/init-user", verifyToken, async (req, res) => {
             // 3. QR CODE MAGIC: Check for Legacy ID and Sync History
             if (legacyID) {
                 console.log(`🔍 Finding Legacy Record: ${legacyID}`);
-                const legacyDoc = await db.collection('legacy_records').doc(legacyID).get();
+                const legacyDoc = await db.collection('legacy_records.').doc(legacyID).get();
                 
                 if (legacyDoc.exists) {
                     const oldData = legacyDoc.data();

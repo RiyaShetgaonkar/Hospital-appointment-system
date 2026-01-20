@@ -98,16 +98,28 @@
 
 <script type="module">
     // AUTOMATICALLY DETECT ENVIRONMENT
-const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const BASE_URL = isLocal 
+        ? "http://localhost:5000" 
+        : "https://hospital-appointment-system-oogs.onrender.com";
 
-const BASE_URL = isLocal 
-    ? "http://localhost:5000"                              // If on laptop, use Local Backend
-    : "https://hospital-appointment-system-oogs.onrender.com"; // If on web, use Live Render Backend 
-    import { db, AVG_TIME } from "./app.js";
-    import {
-        collection, getDocs, deleteDoc, query, orderBy, onSnapshot,
-        doc, setDoc, getDoc, updateDoc, arrayUnion
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { 
+        getFirestore, collection, getDocs, deleteDoc, query, orderBy, onSnapshot, 
+        doc, setDoc, getDoc, updateDoc, arrayUnion 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // CONFIG
+    const firebaseConfig = {
+        apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
+        authDomain: "hospital-system-88ee9.firebaseapp.com",
+        projectId: "hospital-system-88ee9",
+        appId: "1:1052835799972:web:81b5f73457d76b777ad731"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const AVG_TIME = 15;
 
     const clinicSelect = document.getElementById("clinicSelect");
     const queueList = document.getElementById("queueList");
@@ -119,7 +131,6 @@ const BASE_URL = isLocal
 
     let queueRef = null;
     let unsubscribe = null;
-    let currentPatientId = null; // Store ID of person currently being served
 
     /* 🔁 1. Real-time Queue Monitor */
     clinicSelect.onchange = () => {
@@ -136,8 +147,6 @@ const BASE_URL = isLocal
             snapshot.forEach((docSnap) => {
                 const d = docSnap.data();
                 const li = document.createElement("li");
-                
-                // Added "View" button to each list item
                 li.innerHTML = `
                     <span>Token <strong>#${d.token}</strong> - ${d.name}</span>
                     <button class="view-btn" onclick="window.viewPatientDetails('${d.uid}')">View</button>
@@ -166,27 +175,23 @@ const BASE_URL = isLocal
         const firstDoc = snap.docs[0];
         const d = firstDoc.data();
 
-        // Save current patient ID for the big button
-        currentPatientId = d.uid;
-        
         // Update UI
         currentBox.innerHTML = `Token #${d.token}<br><small>${d.name}</small>`;
         
-        // Show the View Button for the main patient
+        // Show View Button
         viewCurrentBtn.style.display = "inline-block";
         viewCurrentBtn.onclick = () => window.viewPatientDetails(d.uid);
 
         // Update Backend Status
         await setDoc(doc(db, "clinic_status", clinic), { currentlyServing: d.token }, { merge: true });
 
-        // Trigger Notification Logic (Simplified for brevity)
+        // Trigger Notification
         triggerNotification(d, snap.docs, clinic);
 
         // Remove from Queue
         await deleteDoc(firstDoc.ref);
     };
 
-    // Helper for Notifications
     async function triggerNotification(currentData, allDocs, clinic) {
         const targetToken = ((Number(currentData.token) + 2) % 50) + 1; 
         const luckyPatient = allDocs.find(doc => Number(doc.data().token) === Number(targetToken));
@@ -206,8 +211,7 @@ const BASE_URL = isLocal
     }
 
     /* =========================================
-       NEW: DOCTOR & PATIENT DETAILS LOGIC
-       (Attached to Window for global access)
+       3. VIEW PATIENT & ADD DETAILS (THE FIX)
        ========================================= */
 
     window.viewPatientDetails = function(patientId) {
@@ -219,27 +223,24 @@ const BASE_URL = isLocal
         modal.innerHTML = "<p>Loading records...</p>";
         overlay.style.display = "flex";
 
-        // Fetch User Data from 'users' collection
         getDoc(doc(db, "users", patientId)).then((docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 
-                // Generate History List
+                // Show History
                 let historyHtml = '<p style="color:grey; font-style:italic;">No past records found.</p>';
-                
                 if (data.medicalHistory && data.medicalHistory.length > 0) {
-                    // Sort history (newest first) logic can go here
                     historyHtml = `<ul style="max-height:150px; overflow-y:auto; padding-left:20px; border:1px solid #eee; padding:10px;">
-                        ${data.medicalHistory.map(item => 
+                        ${data.medicalHistory.slice().reverse().map(item => 
                             `<li style="margin-bottom:10px;">
                                 <strong>${item.date}:</strong> ${item.diagnosis} <br>
-                                <span style="color:#666; font-size:0.9em;">💊 Rx: ${item.prescription}</span>
+                                <span style="color:#666; font-size:0.9em;">💊 ${item.medication || item.prescription}</span>
                             </li>`
                         ).join('')}
                     </ul>`;
                 }
 
-                // Inject HTML
+                // 📝 HERE IS THE INPUT FORM FOR THE DOCTOR
                 modal.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <h3>${data.name} <span style="font-size:0.7em; color:grey">(${data.bloodGroup || 'Blood Type N/A'})</span></h3>
@@ -253,16 +254,20 @@ const BASE_URL = isLocal
 
                     <div class="consultation-form" style="border-top:2px solid #eee; padding-top:10px;">
                         <h4 style="margin-top:0;">📝 Today's Consultation</h4>
-                        <input type="text" id="doc-diagnosis" placeholder="Diagnosis (e.g. Viral Fever)" style="width:100%; padding:10px; margin-bottom:10px; box-sizing:border-box;">
-                        <input type="text" id="doc-prescription" placeholder="Prescription (e.g. Paracetamol)" style="width:100%; padding:10px; margin-bottom:10px; box-sizing:border-box;">
                         
-                        <button onclick="updatePatientRecord('${patientId}')" style="background:green; color:white; padding:12px; width:100%; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">
-                            ✅ Complete Visit & Update Record
+                        <label style="font-size:12px;">Diagnosis</label>
+                        <input type="text" id="doc-diagnosis" placeholder="e.g. Viral Fever" style="width:100%; padding:10px; margin-bottom:10px; box-sizing:border-box;">
+                        
+                        <label style="font-size:12px;">Medication / Prescription</label>
+                        <input type="text" id="doc-medication" placeholder="e.g. Paracetamol 500mg" style="width:100%; padding:10px; margin-bottom:10px; box-sizing:border-box;">
+                        
+                        <button onclick="updatePatientRecord('${patientId}')" style="background:#27ae60; color:white; padding:12px; width:100%; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">
+                            ✅ Save & Complete Visit
                         </button>
                     </div>
                 `;
             } else {
-                modal.innerHTML = "<p>Error: Patient profile not found in database.</p><button onclick='closeModal()'>Close</button>";
+                modal.innerHTML = "<p>Error: Patient profile not found.</p><button onclick='closeModal()'>Close</button>";
             }
         });
     }
@@ -271,32 +276,34 @@ const BASE_URL = isLocal
         document.getElementById("modalOverlay").style.display = "none";
     }
 
+    // 💾 4. SAVE TO DATABASE (Aligns with Dashboard)
     window.updatePatientRecord = function(patientId) {
         const diagnosis = document.getElementById("doc-diagnosis").value;
-        const prescription = document.getElementById("doc-prescription").value;
+        const medication = document.getElementById("doc-medication").value;
+        const clinicName = document.getElementById("clinicSelect").value; // Gets "Dermatology", "ENT", etc.
         
         if(!diagnosis) return alert("Please enter a diagnosis.");
 
-        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        const today = new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
 
+        // 🔥 CRITICAL: Field names must match Dashboard logic
         const newVisit = {
             date: today,
             diagnosis: diagnosis,
-            prescription: prescription || "None",
-            doctor: "Dr. On Duty"
+            medication: medication || "None", // Saved as 'medication'
+            department: clinicName || "General Clinic" // Saved as 'department'
         };
 
         updateDoc(doc(db, "users", patientId), {
             medicalHistory: arrayUnion(newVisit)
         }).then(() => {
-            alert("Patient Record Updated Successfully!");
+            alert("Record Saved!");
             window.closeModal();
         }).catch((error) => {
             console.error("Error updating record:", error);
             alert("Failed to update record.");
         });
     }
-
 </script>
 </body>
 </html>

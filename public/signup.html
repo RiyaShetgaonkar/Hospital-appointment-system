@@ -94,18 +94,18 @@
   </p>
 </div>
 
-<script type="module">
- // AUTOMATICALLY DETECT ENVIRONMENT
-const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 
-const BASE_URL = isLocal 
-    ? "http://localhost:5000"                              // If on laptop, use Local Backend
-    : "https://hospital-appointment-system-oogs.onrender.com"; // If on web, use Live Render Backend
-  
-  // 1. Import Auth AND Firestore
+<script type="module">
+  // 1. IMPORTS MUST BE FIRST!
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // 2. NOW we can do the logic
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BASE_URL = isLocal 
+    ? "http://localhost:5000" 
+    : "https://hospital-appointment-system-oogs.onrender.com";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
@@ -117,10 +117,10 @@ const BASE_URL = isLocal
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const db = getFirestore(app); // Initialize Database
+  const db = getFirestore(app); 
 
   // ==========================================
-  //  QR CODE DETECTION LOGIC (New Syntax)
+  //  QR CODE DETECTION LOGIC
   // ==========================================
   const urlParams = new URLSearchParams(window.location.search);
   const legacyID = urlParams.get('legacyID');
@@ -129,7 +129,7 @@ const BASE_URL = isLocal
     console.log("Found QR Code ID:", legacyID);
     
     // Fetch the "Old Paper Data" from Firestore
-    const docRef = doc(db, "legacy_records", legacyID);
+    const docRef = doc(db, "legacy_records.", legacyID);
     
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
@@ -138,15 +138,18 @@ const BASE_URL = isLocal
             // VISUAL MAGIC: Auto-fill the inputs!
             if(document.getElementById('signup-name')) {
                 document.getElementById('signup-name').value = data.fullName;
-                // Make it read-only if you want to force them to use that name
-                // document.getElementById('signup-name').readOnly = true; 
+                // Make it read-only so they know it's special
+                document.getElementById('signup-name').readOnly = true; 
+                document.getElementById('signup-name').style.backgroundColor = "#e8f0fe";
             }
             if(document.getElementById('signup-age')) {
                 document.getElementById('signup-age').value = data.age; 
             }
             
             // Show alert
-            alert(`🏥 Welcome back, ${data.fullName}! We found your hospital records. Create a password to claim them.`);
+            alert(`🏥 System Connected: Found records for ${data.fullName}. Create a password to claim them.`);
+        } else {
+            console.log("No such document!");
         }
     }).catch(error => {
         console.error("Error finding records:", error);
@@ -159,7 +162,7 @@ const BASE_URL = isLocal
   document.getElementById("signupForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const name = document.getElementById("signup-name").value; // Get the name!
+    const name = document.getElementById("signup-name").value;
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
@@ -172,8 +175,6 @@ const BASE_URL = isLocal
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
-      // Get Firebase ID token
       const idToken = await user.getIdToken();
 
       // Send token AND NAME to backend
@@ -183,21 +184,21 @@ const BASE_URL = isLocal
           "Content-Type": "application/json",
           "Authorization": `Bearer ${idToken}`
         },
-        // We now send the name too, so the backend can save it!
-        body: JSON.stringify({ email: email, 
-      name: name,
-      legacyID: legacyID }) 
+        body: JSON.stringify({ 
+            email: email, 
+            name: name,
+            legacyID: legacyID 
+        }) 
       });
 
       const data = await res.json();
       alert(data.message);
-
-      // Redirect to form page
       window.location.href = "form.html";
     } catch (err) {
       alert(err.message);
     }
   });
+
 </script>
 
 </body>

@@ -1,501 +1,4 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Care Connect - Home</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
-      font-family: 'Roboto', sans-serif;
-      color: #2c3e50;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      line-height: 1.6;
-    }
-    header {
-      background-color: #ffffff;
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border-bottom: 3px solid #3498db;
-    }
-    .logo-container {
-      display: flex;
-      align-items: center;
-    }
-    .logo-img {
-      width: 50px;
-      height: 50px;
-      margin-right: 15px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .logo {
-      font-size: 32px;
-      color: #2c3e50;
-      font-weight: 700;
-      font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
-    }
-    .profile {
-      position: relative;
-      cursor: pointer;
-    }
-    .profile i {
-      font-size: 35px;
-      color: #3498db;
-      border: 3px solid #3498db;
-      border-radius: 50%;
-      padding: 5px;
-      background-color: #ffffff;
-      transition: all 0.3s ease;
-    }
-    .profile i:hover {
-      color: #2980b9;
-      border-color: #2980b9;
-      transform: scale(1.05);
-    }
-    .dropdown {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 50px;
-      background-color: #ffffff;
-      border: 2px solid #3498db;
-      border-radius: 8px;
-      min-width: 180px;
-      z-index: 1;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    }
-    .dropdown a {
-      color: #2c3e50;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-      font-size: 16px;
-      font-weight: 500;
-      transition: background-color 0.3s ease;
-    }
-    .dropdown a:hover {
-      background-color: #ecf0f1;
-    }
-    .main-body {
-      padding: 60px 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .welcome {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    .welcome h1 {
-      font-size: 36px;
-      font-weight: 700;
-      color: #2c3e50;
-      margin-bottom: 10px;
-    }
-    .welcome p {
-      font-size: 18px;
-      font-weight: 400;
-      color: #7f8c8d;
-      max-width: 700px;
-      line-height: 1.7;
-    }
-    .hospitals-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-      gap: 30px;
-      width: 100%;
-      justify-items: center;
-    }
-    .hospital-card {
-      background: linear-gradient(135deg, #ffffff 0%, #f1f8ff 50%, #e3f2fd 100%);
-      border: 1px solid #e1e8ed;
-      border-radius: 16px;
-      padding: 30px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      color: inherit;
-      position: relative;
-      overflow: hidden;
-    }
-    .hospital-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
-    }
-    .hospital-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-      border-color: #3498db;
-    }
-    .hospital-card i {
-      font-size: 48px;
-      color: #3498db;
-      margin-right: 20px;
-      background-color: #e3f2fd;
-      padding: 15px;
-      border-radius: 12px;
-      transition: all 0.3s ease;
-    }
-    .hospital-card:hover i {
-      color: #2980b9;
-      background-color: #d4edda;
-    }
-    .hospital-card .content h3 {
-      font-size: 24px;
-      font-weight: 600;
-      color: #2c3e50;
-      margin-bottom: 8px;
-    }
-    .hospital-card .content p {
-      font-size: 16px;
-      font-weight: 400;
-      color: #7f8c8d;
-    }
-  </style>
-</head>
-
-<body>
-
-<header>
-  <div class="logo-container">
-    <img src="logo.jpeg" alt="Care Connect Logo" class="logo-img">
-    <div class="logo">Care Connect</div>
-  </div>
-  <div class="profile" id="profile">
-    <i class="fas fa-user-circle"></i>
-    <div class="dropdown" id="dropdown">
-      <a href="viewdetails.html"><i class="fas fa-user"></i> View My Details</a>
-      <a href="change-details.html"><i class="fas fa-edit"></i> Edit My Details</a>
-      <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
-    </div>
-  </div>
-</header>
-
-<div class="main-body">
-  <div class="welcome">
-    <h1>Welcome to Care Connect</h1>
-    <p>Your gateway to quality healthcare in Goa. Explore trusted hospitals and medical centers, browse profiles, check doctor availability, and book appointments seamlessly. We connect you with reliable providers for timely, accessible, and quality care for you and your family.</p>
-  </div>
-  <div class="hospitals-grid">
-    <div class="hospital-card" onclick="window.location.href='appointment-page.html'">
-      <i class="fas fa-hospital"></i>
-      <div class="content">
-        <h3>Goa Medical College and Hospital (GMC)</h3>
-        <p>Bambolim, Central Goa </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
-    authDomain: "hospital-system-88ee9.firebaseapp.com",
-    projectId: "hospital-system-88ee9",
-    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-// 🚫 Prevent back button access after logout
-window.history.pushState(null, null, window.location.href);
-window.addEventListener('popstate', () => {
-  window.history.pushState(null, null, window.location.href);
-});
-
-
-  onAuthStateChanged(auth, (user) => {
-    if (!user) window.location.href = "login.html";
-  });
-
-  const profile = document.getElementById('profile');
-  const dropdown = document.getElementById('dropdown');
-
-  profile.addEventListener('click', () => {
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-  });
-
- document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-  e.preventDefault();
-
-  await signOut(auth);
-
-  // 🔒 Replace instead of redirect (kills browser history)
-  window.location.replace("index.html");
-});
-
-
-  window.addEventListener('click', (e) => {
-    if (!profile.contains(e.target)) dropdown.style.display = 'none';
-  });
-</script>
-
-</body>
-</html> -->
 <!-- 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Care Connect - Home</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
-      font-family: 'Roboto', sans-serif;
-      color: #2c3e50;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      line-height: 1.6;
-    }
-    header {
-      background-color: #ffffff;
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border-bottom: 3px solid #3498db;
-    }
-    .logo-container { display: flex; align-items: center; }
-    .logo-img { width: 50px; height: 50px; margin-right: 15px; border-radius: 50%; object-fit: cover; }
-    .logo { font-size: 32px; color: #2c3e50; font-weight: 700; font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif; }
-    .profile { position: relative; cursor: pointer; }
-    .profile i {
-      font-size: 35px; color: #3498db; border: 3px solid #3498db;
-      border-radius: 50%; padding: 5px; background-color: #ffffff; transition: all 0.3s ease;
-    }
-    .profile i:hover { color: #2980b9; border-color: #2980b9; transform: scale(1.05); }
-    .dropdown {
-      display: none; position: absolute; right: 0; top: 50px;
-      background-color: #ffffff; border: 2px solid #3498db; border-radius: 8px;
-      min-width: 180px; z-index: 1; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    }
-    .dropdown a {
-      color: #2c3e50; padding: 12px 16px; text-decoration: none; display: block;
-      font-size: 16px; font-weight: 500; transition: background-color 0.3s ease;
-    }
-    .dropdown a:hover { background-color: #ecf0f1; }
-    .main-body {
-      padding: 60px 40px; display: flex; flex-direction: column; align-items: center;
-      max-width: 1200px; margin: 0 auto;
-    }
-    .welcome { text-align: center; margin-bottom: 40px; }
-    .welcome h1 { font-size: 36px; font-weight: 700; color: #2c3e50; margin-bottom: 10px; }
-    .welcome p { font-size: 18px; font-weight: 400; color: #7f8c8d; max-width: 700px; line-height: 1.7; }
-    .hospitals-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-      gap: 30px; width: 100%; justify-items: center; margin-bottom: 40px;
-    }
-    .hospital-card {
-      background: linear-gradient(135deg, #ffffff 0%, #f1f8ff 50%, #e3f2fd 100%);
-      border: 1px solid #e1e8ed; border-radius: 16px; padding: 30px; cursor: pointer;
-      transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      display: flex; align-items: center; text-decoration: none; color: inherit;
-      position: relative; overflow: hidden;
-    }
-    .hospital-card::before {
-      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-      background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
-    }
-    .hospital-card:hover { transform: translateY(-5px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); border-color: #3498db; }
-    .hospital-card i {
-      font-size: 48px; color: #3498db; margin-right: 20px; background-color: #e3f2fd;
-      padding: 15px; border-radius: 12px; transition: all 0.3s ease;
-    }
-    .hospital-card:hover i { color: #2980b9; background-color: #d4edda; }
-    .hospital-card .content h3 { font-size: 24px; font-weight: 600; color: #2c3e50; margin-bottom: 8px; }
-    .hospital-card .content p { font-size: 16px; font-weight: 400; color: #7f8c8d; }
-
-    /* --- NEW: HISTORY SECTION STYLES --- */
-    #medical-history-container {
-      width: 100%; max-width: 800px; background: white; padding: 25px;
-      border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-      border: 1px solid #e1e8ed;
-    }
-    .history-item {
-      border-bottom: 1px solid #eee; padding: 15px 0; display: flex;
-      justify-content: space-between; align-items: flex-start;
-    }
-    .history-item:last-child { border-bottom: none; }
-    .history-date { font-weight: bold; color: #d9534f; min-width: 100px; }
-    .history-details { flex-grow: 1; margin-left: 15px; }
-    .rx-badge {
-      display: inline-block; background: #e8f5e9; color: #2e7d32;
-      padding: 2px 8px; border-radius: 4px; font-size: 0.85em; margin-top: 5px;
-    }
-  </style>
-</head>
-
-<body>
-
-<header>
-  <div class="logo-container">
-    <img src="logo.jpeg" alt="Care Connect Logo" class="logo-img">
-    <div class="logo">Care Connect</div>
-  </div>
-  <div class="profile" id="profile">
-    <i class="fas fa-user-circle"></i>
-    <div class="dropdown" id="dropdown">
-      <a href="viewdetails.html"><i class="fas fa-user"></i> View My Details</a>
-      <a href="change-details.html"><i class="fas fa-edit"></i> Edit My Details</a>
-      <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
-    </div>
-  </div>
-</header>
-
-<div class="main-body">
-  <div class="welcome">
-    <h1>Welcome to Care Connect</h1>
-    <p>Your gateway to quality healthcare in Goa. Connect with reliable providers for timely, accessible, and quality care.</p>
-  </div>
-
-  <div class="hospitals-grid">
-    <div class="hospital-card" onclick="window.location.href='appointment-page.html'">
-      <i class="fas fa-hospital"></i>
-      <div class="content">
-        <h3>Goa Medical College (GMC)</h3>
-        <p>Bambolim, Central Goa</p>
-      </div>
-    </div>
-  </div>
-
-  <div id="medical-history-container">
-    <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top:0;">
-      📂 My Digital Medical Records
-    </h2>
-    <div id="medical-history-list">
-      <p style="color:grey; font-style:italic;">Loading your records...</p>
-    </div>
-  </div>
-
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  // ✅ NEW: Import Firestore functions
-  import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  // AUTOMATICALLY DETECT ENVIRONMENT
-const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-
-const BASE_URL = isLocal 
-    ? "http://localhost:5000"                              // If on laptop, use Local Backend
-    : "https://hospital-appointment-system-oogs.onrender.com"; // If on web, use Live Render Backend
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
-    authDomain: "hospital-system-88ee9.firebaseapp.com",
-    projectId: "hospital-system-88ee9",
-    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app); // ✅ Initialize Database
-
-  // Prevent back button
-  window.history.pushState(null, null, window.location.href);
-  window.addEventListener('popstate', () => {
-    window.history.pushState(null, null, window.location.href);
-  });
-
-  // Auth Listener
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location.href = "index.html";
-    } else {
-      // ✅ CALL THE LISTENER WHEN USER LOGS IN
-      listenToHistory(user.uid);
-    }
-  });
-
-  const profile = document.getElementById('profile');
-  const dropdown = document.getElementById('dropdown');
-
-  profile.addEventListener('click', () => {
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-  });
-
-  document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-    e.preventDefault();
-    await signOut(auth);
-    window.location.replace("index.html");
-  });
-
-  window.addEventListener('click', (e) => {
-    if (!profile.contains(e.target)) dropdown.style.display = 'none';
-  });
-
-  // ✅ THE NEW FUNCTION: Listens for Database Updates
-  function listenToHistory(uid) {
-    const historyContainer = document.getElementById('medical-history-list');
-
-    // This runs automatically whenever the database changes!
-    onSnapshot(doc(db, "users", uid), (docSnap) => {
-        if (docSnap.exists() && docSnap.data().medicalHistory && docSnap.data().medicalHistory.length > 0) {
-            
-            // Get history and reverse it so newest is on top
-            const history = docSnap.data().medicalHistory.reverse();
-            
-            // Build the HTML List
-            historyContainer.innerHTML = `
-                <div style="max-height: 300px; overflow-y: auto;">
-                    ${history.map(h => `
-                        <div class="history-item">
-                            <div class="history-date">${h.date}</div>
-                            <div class="history-details">
-                                <strong>${h.diagnosis}</strong><br>
-                                <span class="rx-badge">💊 Rx: ${h.prescription}</span>
-                                <div style="font-size:0.8em; color:#888; margin-top:2px;">
-                                    Doctor: ${h.doctor || 'Dr. On Duty'}
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        } else {
-            historyContainer.innerHTML = `
-                <div style="text-align: center; padding: 20px; color: #888;">
-                    <i class="fas fa-folder-open" style="font-size: 40px; color: #ddd; margin-bottom: 10px;"></i>
-                    <p>No medical records found.</p>
-                    <small>Scan your QR code to sync old hospital files.</small>
-                </div>
-            `;
-        }
-    });
-  }
-</script>
-
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -703,6 +206,281 @@ const BASE_URL = isLocal
 
                 // 2. 🛑 STRICT CHECK: Only looks for 'medication' and 'department'
                 // It intentionally IGNORES 'prescription' and 'doctor'
+                const medicine = h.medication || "None";
+                const clinic = h.department || "General Clinic";
+
+                // 3. GENERATE CARD
+                const card = `
+                    <div class="history-card">
+                        <div class="history-header">
+                            <div class="clinic-name">🏥 ${clinic}</div>
+                            <div class="record-date">${dateString}</div>
+                        </div>
+                        <div class="history-details">
+                            <div class="detail-item">
+                                <strong>Diagnosis</strong>
+                                <span>${h.diagnosis || "N/A"}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Medication</strong>
+                                <span class="rx-badge">💊 ${medicine}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                historyContainer.innerHTML += card;
+            });
+
+        } else {
+            historyContainer.innerHTML = `<div class="empty-state"><i class="fas fa-folder"></i><p>No medical records found.</p></div>`;
+        }
+    });
+  }
+</script>
+
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Care Connect - Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
+      font-family: 'Roboto', sans-serif;
+      color: #2c3e50;
+      margin: 0; padding: 0; min-height: 100vh; line-height: 1.6;
+    }
+    header {
+      background-color: #ffffff; padding: 20px 40px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-bottom: 3px solid #3498db;
+    }
+    .logo-container { display: flex; align-items: center; }
+    .logo-img { width: 50px; height: 50px; margin-right: 15px; border-radius: 50%; object-fit: cover; }
+    .logo { font-size: 32px; color: #2c3e50; font-weight: 700; font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif; }
+    
+    .profile { position: relative; cursor: pointer; }
+    .profile i {
+      font-size: 35px; color: #3498db; border: 3px solid #3498db;
+      border-radius: 50%; padding: 5px; background-color: #ffffff; transition: all 0.3s ease;
+    }
+    .profile i:hover { transform: scale(1.05); }
+    
+    .dropdown {
+      display: none; position: absolute; right: 0; top: 50px;
+      background-color: #ffffff; border: 2px solid #3498db; border-radius: 8px;
+      min-width: 180px; z-index: 100; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+    .dropdown a {
+      color: #2c3e50; padding: 12px 16px; text-decoration: none; display: block;
+      font-size: 16px; font-weight: 500; transition: background-color 0.3s ease;
+    }
+    .dropdown a:hover { background-color: #ecf0f1; }
+
+    .main-body {
+      padding: 40px; display: flex; flex-direction: column; align-items: center;
+      max-width: 1000px; margin: 0 auto;
+    }
+    .welcome { text-align: center; margin-bottom: 30px; }
+    .welcome h1 { font-size: 32px; font-weight: 700; color: #2c3e50; }
+    .welcome p { font-size: 16px; color: #7f8c8d; }
+
+    /* --- HOSPITAL CARD --- */
+    .hospitals-grid { width: 100%; margin-bottom: 40px; }
+    .hospital-card {
+      background: white; border: 1px solid #e1e8ed; border-radius: 12px; padding: 25px;
+      cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      display: flex; align-items: center; position: relative; overflow: hidden;
+    }
+    .hospital-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+      background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
+    }
+    .hospital-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    .hospital-card i { font-size: 40px; color: #3498db; margin-right: 20px; }
+    
+    /* --- 📂 DIGITAL RECORDS STYLES --- */
+    #medical-history-container {
+      width: 100%; background: white; padding: 30px;
+      border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    /* THE CARD STYLE */
+    .history-card {
+        border: 1px solid #e1e4e8; border-left: 5px solid #3498db;
+        border-radius: 8px; padding: 20px; margin-bottom: 15px;
+        background-color: #fafbfc; display: flex; flex-direction: column;
+    }
+    .history-header {
+        display: flex; justify-content: space-between; margin-bottom: 12px;
+        border-bottom: 1px solid #eee; padding-bottom: 8px;
+    }
+    .clinic-name { font-weight: bold; font-size: 18px; color: #2c3e50; }
+    .record-date { color: #829ab1; font-size: 14px; font-weight: 500; }
+    
+    .history-details {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+    }
+    .detail-item strong { 
+        color: #7f8c8d; display: block; font-size: 12px; 
+        text-transform: uppercase; margin-bottom: 4px;
+    }
+    .detail-item span { color: #2c3e50; font-weight: 500; font-size: 15px;}
+    .rx-badge {
+        color: #e74c3c; font-weight: bold;
+    }
+
+    .empty-state {
+        text-align: center; padding: 40px; color: #829ab1;
+    }
+    .empty-state i { font-size: 48px; margin-bottom: 10px; color: #d9e2ec; }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo-container">
+    <img src="logo.jpeg" alt="Care Connect Logo" class="logo-img">
+    <div class="logo">Care Connect</div>
+  </div>
+  <div class="profile" id="profile">
+    <i class="fas fa-user-circle"></i>
+    <div class="dropdown" id="dropdown">
+      <a href="viewdetails.html"><i class="fas fa-user"></i> View My Details</a>
+      <a href="change-details.html"><i class="fas fa-edit"></i> Edit My Details</a>
+      <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+    </div>
+  </div>
+</header>
+
+<div class="main-body">
+  <div class="welcome">
+    <h1>Welcome to Care Connect</h1>
+    <p>Your gateway to quality healthcare in Goa. Connect with reliable providers.</p>
+  </div>
+
+  <div class="hospitals-grid">
+    <div class="hospital-card" onclick="window.location.href='appointment-page.html'">
+      <i class="fas fa-hospital"></i>
+      <div class="content">
+        <h3>Goa Medical College (GMC)</h3>
+        <p>Bambolim, Central Goa</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="medical-history-container">
+    <h2 style="color: #2c3e50; margin-top:0; margin-bottom: 20px;">
+      <i class="fas fa-folder-open" style="color:#f39c12;"></i> My Digital Records
+    </h2>
+    
+    <div id="medical-history-list">
+      <p style="text-align:center;">Loading your records...</p>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  // 🔥 NEW IMPORT FOR NOTIFICATIONS
+  import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  
+  const firebaseConfig = {
+    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
+    authDomain: "hospital-system-88ee9.firebaseapp.com",
+    projectId: "hospital-system-88ee9",
+    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const messaging = getMessaging(app); // Initialize Messaging
+
+  // Auth & Navigation
+  window.history.pushState(null, null, window.location.href);
+  window.addEventListener('popstate', () => window.history.pushState(null, null, window.location.href));
+
+  // 🔔 NOTIFICATION PERMISSION FUNCTION
+  async function saveMessagingToken(user) {
+    try {
+        console.log("Requesting notification permission...");
+        const permission = await Notification.requestPermission();
+        
+        if (permission === 'granted') {
+            const token = await getToken(messaging, { 
+                vapidKey: "BOT1Q21oyILkMsjOYypmL9r_2uAK3xspTUfptTFI-RPyhDAHT4Rr_jxvHkTo2r3EUi5mpTnpgelcFuIV6V7LOmg" // ⚠️ REPLACE THIS with your real Key
+            });
+            
+            if (token) {
+                console.log("FCM Token obtained:", token);
+                // Save token to Firestore so the backend can find it later
+                await updateDoc(doc(db, "users", user.uid), {
+                    fcmToken: token
+                });
+                console.log("Notification Token Saved to DB!");
+            }
+        } else {
+            console.log("Permission denied for notifications.");
+        }
+    } catch (error) {
+        console.error("Notification permission error:", error);
+    }
+  }
+
+  // Auth Listener
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = "index.html";
+    } else {
+        listenToHistory(user.uid);
+        saveMessagingToken(user); // 🔥 TRIGGER PERMISSION REQUEST
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    await signOut(auth);
+    window.location.replace("login.html");
+  });
+
+  const profile = document.getElementById('profile');
+  const dropdown = document.getElementById('dropdown');
+  profile.addEventListener('click', () => dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block');
+  window.addEventListener('click', (e) => { if (!profile.contains(e.target)) dropdown.style.display = 'none'; });
+
+  /* ------------------------------------------------
+     🔥 STRICT STANDARD LISTENER (New Format Only)
+     ------------------------------------------------ */
+  function listenToHistory(uid) {
+    const historyContainer = document.getElementById('medical-history-list');
+
+    onSnapshot(doc(db, "users", uid), (docSnap) => {
+        if (docSnap.exists() && docSnap.data().medicalHistory && docSnap.data().medicalHistory.length > 0) {
+            
+            // Get history array and reverse it (Newest First)
+            const history = docSnap.data().medicalHistory.slice().reverse();
+            historyContainer.innerHTML = "";
+
+            history.forEach(h => {
+                // 1. DATE FIX
+                let dateString = "Unknown Date";
+                if(h.date && h.date.seconds) {
+                    dateString = new Date(h.date.seconds * 1000).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+                } else if (h.date) {
+                    dateString = h.date;
+                }
+
+                // 2. 🛑 STRICT CHECK
                 const medicine = h.medication || "None";
                 const clinic = h.department || "General Clinic";
 

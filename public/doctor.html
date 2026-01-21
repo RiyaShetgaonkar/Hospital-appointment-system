@@ -243,6 +243,24 @@
 
         await setDoc(doc(db, "clinic_status", clinic), { currentlyServing: currentServingData.token }, { merge: true });
         await deleteDoc(firstDoc.ref);
+        try {
+             // Detect Environment
+             const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+             const BASE_URL = isLocal ? "http://localhost:5000" : "https://hospital-appointment-system-oogs.onrender.com";
+
+             await fetch(`${BASE_URL}/api/notify/queue-update`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    currentPatientId: currentServingData.uid,
+                    clinic: clinic
+                })
+            });
+            console.log("Notification trigger sent");
+        } catch (err) {
+            console.error("Failed to trigger notification", err);
+        }
+        // ---------------------------------------------------------
     };
 
     window.viewPatientDetails = async (patientId, isEditable = false) => {

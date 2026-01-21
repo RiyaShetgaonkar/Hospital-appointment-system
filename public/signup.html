@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
   <title>Signup</title>
@@ -202,4 +202,220 @@
 </script>
 
 </body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Signup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #f0f8ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #003366;
+      margin: 0; padding: 0;
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: #ffffff; padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15);
+      width: 90%; max-width: 400px;
+      text-align: center; border: 1px solid #e0e0e0;
+    }
+    h2 { color: #003366; margin-bottom: 20px; font-weight: 600; }
+    
+    input {
+      border: 2px solid #b0c4de; padding: 12px; margin: 10px 0;
+      width: 100%; border-radius: 5px; font-size: 16px;
+      transition: border-color 0.3s ease; box-sizing: border-box;
+    }
+    input:focus { border-color: #4682b4; outline: none; }
+    
+    /* Special Style for Read-Only Name (QR Code) */
+    input[readonly] { background-color: #e8f0fe; color: #555; font-weight: bold; cursor: not-allowed; }
+
+    button {
+      background-color: #4682b4; color: white; padding: 12px;
+      border: none; border-radius: 5px; width: 100%;
+      cursor: pointer; font-size: 16px; font-weight: 500;
+      transition: background-color 0.3s ease; margin-top: 10px;
+    }
+    button:hover { background-color: #003366; }
+    button:disabled { background-color: #ccc; cursor: wait; }
+    
+    p { margin-top: 20px; font-size: 14px; }
+    a { color: #4682b4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Create Account</h2>
+
+  <form id="signupForm">
+    <input type="text" id="signup-name" placeholder="Full Name" required>
+    
+    <input type="text" id="userIdentifier" placeholder="Email OR 10-digit Mobile Number" required>
+    
+    <input type="password" id="password" placeholder="Password" required>
+    <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+    
+    <input type="hidden" id="signup-age"> 
+
+    <button type="submit" id="signupBtn">Signup</button>
+  </form>
+
+  <p>
+    Already have an account?
+    <a href="index.html">Login</a>
+  </p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  // Added 'setDoc' to save the profile structure directly
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // CONFIG
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BASE_URL = isLocal 
+    ? "http://localhost:5000" 
+    : "https://hospital-appointment-system-oogs.onrender.com";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
+    authDomain: "hospital-system-88ee9.firebaseapp.com",
+    projectId: "hospital-system-88ee9",
+    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app); 
+
+  // 1. QR CODE AUTO-FILL LOGIC
+  const urlParams = new URLSearchParams(window.location.search);
+  const legacyID = urlParams.get('legacyID');
+
+  if (legacyID) {
+    console.log("Looking for legacy records:", legacyID);
+    const docRef = doc(db, "legacy_records.", legacyID);
+    
+    getDoc(docRef).then((docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            
+            if(document.getElementById('signup-name')) {
+                const nameInput = document.getElementById('signup-name');
+                nameInput.value = data.fullName;
+                nameInput.readOnly = true; 
+                nameInput.style.backgroundColor = "#e8f0fe";
+            }
+            if(document.getElementById('signup-age')) {
+                document.getElementById('signup-age').value = data.age || ""; 
+            }
+            alert(`✅ Records Found for ${data.fullName}! Create a password to link them.`);
+        }
+    }).catch(error => console.error("Error fetching records:", error));
+  }
+
+  // 2. SIGNUP LOGIC (Phone OR Email)
+  document.getElementById("signupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("signupBtn");
+    btn.textContent = "Creating...";
+    btn.disabled = true;
+
+    const name = document.getElementById("signup-name").value;
+    const identifier = document.getElementById("userIdentifier").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+      btn.textContent = "Signup";
+      btn.disabled = false;
+      return alert("Passwords do not match");
+    }
+
+    // 🧠 LOGIC: Separate Login Credential from Profile Data
+    let authEmail = identifier;      // Used for Firebase Login
+    let databaseEmail = identifier;  // Saved in Profile
+    let databasePhone = "N/A";       // Saved in Profile
+
+    const phoneRegex = /^[0-9]{10}$/; // Check for 10 digits
+
+    if (phoneRegex.test(identifier)) {
+        // CASE: PHONE SIGNUP
+        authEmail = `${identifier}@careconnect.com`; // Pseudo-email for Auth
+        databaseEmail = "Not Entered";               // Mark as missing for warnings
+        databasePhone = identifier;                  // Save actual phone
+    } else if (!identifier.includes("@")) {
+        // CASE: INVALID
+        btn.textContent = "Signup";
+        btn.disabled = false;
+        return alert("Please enter a valid Email (e.g. name@mail.com) OR a 10-digit Mobile Number.");
+    } else {
+        // CASE: EMAIL SIGNUP
+        // authEmail is already the email
+        // databaseEmail is already the email
+        databasePhone = "N/A";
+    }
+
+    try {
+      // 1. Create User in Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, authEmail, password);
+      const user = userCredential.user;
+      const idToken = await user.getIdToken();
+
+      // 2. Save Profile DIRECTLY to Firestore (Ensures "Not Entered" logic works)
+      // We save it here to guarantee the structure matches your requirements
+      await setDoc(doc(db, "users", user.uid), {
+          name: name,
+          email: databaseEmail, // Will be "Not Entered" if phone used
+          phone: databasePhone, // Will be "N/A" if email used
+          createdAt: new Date(),
+          role: "patient",
+          legacyID: legacyID || null,
+          medicalHistory: [] // Start with empty array
+      });
+
+      // 3. Notify Backend (For any additional server-side setup)
+      const res = await fetch(`${BASE_URL}/api/auth/init-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ 
+            email: databaseEmail, 
+            phone: databasePhone,
+            name: name,
+            legacyID: legacyID 
+        }) 
+      });
+
+      if(res.ok){
+          alert("Account Created Successfully! Redirecting...");
+          window.location.href = "form.html";
+      } else {
+          // Even if backend fails slightly, we have Auth + Firestore, so proceed
+          console.warn("Backend sync warning");
+          window.location.href = "form.html";
+      }
+
+    } catch (err) {
+      alert("Signup Failed: " + err.message);
+      btn.textContent = "Signup";
+      btn.disabled = false;
+    }
+  });
+</script>
+
+</body>
 </html>
+
+```

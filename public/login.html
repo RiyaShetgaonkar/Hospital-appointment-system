@@ -77,7 +77,8 @@
       font-size: 28px;
       font-weight: 700;
     }
-    input[type="email"], input[type="password"] {
+    /* CHANGED: Removed type=email specificity to allow text input styling */
+    input {
       border: 2px solid #b0c4de;
       padding: 12px;
       margin: 10px 0;
@@ -87,7 +88,7 @@
       font-size: 16px;
       transition: border-color 0.3s ease;
     }
-    input[type="email"]:focus, input[type="password"]:focus {
+    input:focus {
       border-color: #3498db;
       outline: none;
       box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
@@ -107,6 +108,10 @@
     }
     button:hover {
       background-color: #2980b9;
+    }
+    button:disabled {
+      background-color: #bdc3c7;
+      cursor: not-allowed;
     }
     p {
       color: #2c3e50;
@@ -136,9 +141,11 @@
   <div class="container">
     <h2>Patient Login</h2>
     <form id="loginForm">
-      <input type="email" id="email" placeholder="Email" required><br><br>
+      <input type="text" id="login-identifier" placeholder="Email or Mobile Number" required><br><br>
+      
       <input type="password" id="password" placeholder="Password" required><br><br>
-      <button type="submit">Login</button>
+      
+      <button type="submit" id="loginBtn">Login</button>
     </form>
     <p>Don't have an account? <a href="signup.html">Signup</a></p>
   </div>
@@ -168,12 +175,32 @@
   document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById("email").value;
+    const btn = document.getElementById("loginBtn");
+    const identifier = document.getElementById("login-identifier").value.trim();
     const password = document.getElementById("password").value;
+
+    btn.textContent = "Verifying...";
+    btn.disabled = true;
+
+    // 🧠 SMART LOGIN LOGIC: Phone vs Email
+    let finalEmail = identifier;
+    const phoneRegex = /^[0-9]{10}$/; // Checks for exactly 10 digits
+    
+    if (phoneRegex.test(identifier)) {
+        // CASE: User typed a mobile number -> Add pseudo-domain
+        finalEmail = `${identifier}@careconnect.com`;
+    } 
+    else if (!identifier.includes("@")) {
+        // CASE: Invalid input
+        alert("Please enter a valid Email or a 10-digit Mobile Number.");
+        btn.textContent = "Login";
+        btn.disabled = false;
+        return;
+    }
 
     try {
       // 1. Authenticate with Firebase
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, finalEmail, password);
       const user = userCredential.user;
 
       // 2. Get ID token
@@ -194,6 +221,9 @@
           const data = await response.json();
           alert(data.message); // Shows specific message: "Access Denied: Dr. Mehta..."
           await signOut(auth);  // Sign out locally so they aren't "half-logged in"
+          
+          btn.textContent = "Login";
+          btn.disabled = false;
           return;
       }
 
@@ -201,12 +231,17 @@
           throw new Error("Account validation failed. Please try again.");
       }
 
-      alert("Login successful!");
+      // alert("Login successful!");
       window.location.href = "dashboard.html";
       
     } catch (error) {
       console.error("Login Error:", error);
-      alert("Login failed: " + error.message);
+      let msg = error.message;
+      if(error.code === "auth/invalid-credential") msg = "Incorrect Mobile Number/Email or Password.";
+      
+      alert("Login failed: " + msg);
+      btn.textContent = "Login";
+      btn.disabled = false;
     }
   });
 </script>

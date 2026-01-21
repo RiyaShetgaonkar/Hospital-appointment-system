@@ -16,18 +16,19 @@
     color: #2c3e50; 
     margin: 0; 
     padding: 0; 
+     background: linear-gradient(135deg, #EDE7E3 0%, #82C0CC 50%, #489FB5 100%);
     min-height: 100vh; 
 }
-        header { background-color: #ffffff; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-bottom: 3px solid #3498db; }
+        header { background-color: #16697A; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-bottom: 3px solid #3498db; }
         .logo-container { display: flex; align-items: center; }
         .logo-img { width: 45px; height: 45px; margin-right: 15px; border-radius: 50%; object-fit: cover; }
-        .logo { font-size: 28px; color: #2c3e50; font-weight: 700; }
+        .logo { font-size: 28px; color:#EDE7E3; font-weight: 700; }
         
         .logout-btn { background-color: #e74c3c; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
         .logout-btn:hover { background-color: #c0392b; }
 
         .main-body { padding: 40px 20px; display: flex; flex-direction: column; align-items: center; max-width: 1200px; margin: 0 auto; }
-        .container { background-color: #ffffff; padding: 35px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); width: 100%; max-width: 600px; text-align: center; border: 1px solid #e1e8ed; position: relative; }
+        .container { background-color:#EDE7E3; padding: 35px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); width: 100%; max-width: 600px; text-align: center; border: 1px solid #e1e8ed; position: relative; }
         .container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%); }
         
         h1 { color: #2c3e50; margin-bottom: 10px; font-size: 28px; font-weight: 700; }
@@ -65,7 +66,7 @@
     <header>
         <div class="logo-container">
             <img src="logo.jpeg" alt="Logo" class="logo-img">
-            <div class="logo">Care Connect <span style="font-weight: 300; font-size: 0.6em; color: #3498db;">GMC Staff</span></div>
+            <div class="logo">Care Connect <span style="font-weight: 300; font-size: 0.6em; color: white;">STAFF</span></div>
         </div>
         <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </header>
@@ -333,21 +334,36 @@
     };
 
     document.getElementById("resetBtn").onclick = async () => {
-        const now = new Date();
-        const hour = now.getHours();
-        if (hour < 17) {
-            alert("⚠️ Restriction: Tokens can only be reset for the next day after 5:00 PM.");
-            return;
+    const now = new Date();
+    const hour = now.getHours();
+
+    // 🧠 LOGIC: Block reset ONLY during active clinic hours (9 AM - 5 PM)
+    // This allows reset anytime from 5:00 PM (17) until 8:59 AM (8)
+    if (hour >= 9 && hour < 17) {
+        alert("⚠️ Restriction: Tokens cannot be reset during active clinic hours (9:00 AM - 5:00 PM).");
+        return;
+    }
+
+    const clinic = clinicSelect.value;
+    if (!clinic) {
+        alert("Please select a clinic first.");
+        return;
+    }
+
+    if (confirm(`Reset ${clinic} token numbering to #1? Existing queue will remain, but new bookings start at #1.`)) {
+        try {
+            // Updated to use the professional palette color variables if needed
+            await setDoc(doc(db, "clinic_status", clinic), { 
+                currentlyServing: 0, 
+                lastTokenIssued: 0 
+            }, { merge: true });
+            
+            alert("✅ Success: Token numbering has been reset for the next session.");
+        } catch (error) { 
+            alert("Reset Failed: " + error.message); 
         }
-        const clinic = clinicSelect.value;
-        if (!clinic) return;
-        if (confirm("Reset token numbering to #1? Current waiting queue will stay.")) {
-            try {
-                await setDoc(doc(db, "clinic_status", clinic), { currentlyServing: 0, lastTokenIssued: 0 }, { merge: true });
-                alert("✅ Success: New patients will start from Token #1.");
-            } catch (error) { alert("Reset Failed: " + error.message); }
-        }
-    };
+    }
+};
 
     const addPatientBtn = document.getElementById("addPatientBtn");
     addPatientBtn.onclick = () => {

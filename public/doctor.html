@@ -45,6 +45,9 @@
 
         #resetBtn { background-color: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; transition: 0.3s; width: 100%; }
         #resetBtn:hover { background-color: #c0392b; }
+
+        #addPatientBtn { background-color: #2ecc71; color: white; border: none; padding: 16px; border-radius: 8px; font-size: 18px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); margin-top: 10px; }
+        #addPatientBtn:hover { background-color: #27ae60; transform: translateY(-2px); }
     </style>
 </head>
 
@@ -91,6 +94,25 @@
                 Estimated Queue Clearance: <span id="eta" style="color: #e74c3c;">—</span>
             </div>
 
+            <button id="addPatientBtn"><i class="fas fa-user-plus"></i> Add Patient</button>
+
+            <div id="addPatientModalOverlay" class="modal-overlay">
+                <div id="add-patient-modal" class="modal-content">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h2 style="margin:0;">Add New Patient</h2>
+                        <button onclick="closeAddPatientModal()" style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
+                    </div>
+                    <hr>
+                    <div class="consultation-form">
+                        <label>Patient Name</label>
+                        <input type="text" id="patientName" placeholder="Enter patient name" required>
+                        <label>Phone Number</label>
+                        <input type="tel" id="patientPhone" placeholder="Enter phone number" required>
+                        <button onclick="addPatientToQueue()" style="width:100%; background:#27ae60; color:white; border:none; padding:12px; border-radius:6px; cursor:pointer; font-weight:bold;">Add Patient</button>
+                    </div>
+                </div>
+            </div>
+
             <button id="resetBtn"><i class="fas fa-sync-alt"></i> Restart Tokens from #1</button>
         </div>
     </div>
@@ -101,7 +123,7 @@
 
 <script type="module">
     import { db, AVG_TIME } from "./app.js";
-    import { collection, getDocs, deleteDoc, query, orderBy, onSnapshot, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { collection, getDocs, deleteDoc, query, orderBy, onSnapshot, doc, setDoc, getDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
     const auth = getAuth();
@@ -139,19 +161,23 @@
 
     document.getElementById("logoutBtn").onclick = () => signOut(auth).then(() => window.location.href = "dlogin.html");
 
-    // 🚀 SMART SYNC: RE-SYNC GOOGLE SHEETS LOGIC (Handles email restriction)
+    // 🚀 SMART SYNC: RE-SYNC GOOGLE SHEETS LOGIC
     async function syncThirdPersonToSheets(patients, clinic) {
         if (patients.length >= 3) {
             const thirdPerson = patients[2]; 
             const data = thirdPerson.data();
 
             if (!data.notified) {
-                // Check if email ends with @careconnect.com
-                const isInternalEmail = data.email && data.email.toLowerCase().endsWith("@careconnect.com");
+                // 🛑 CHECK: If patient is marked manual, skip Google Sheets sync
+                if (data.source === "manual") {
+                    console.log(`🚫 Skipping Sheets sync for manual entry: ${data.name}`);
+                    await updateDoc(thirdPerson.ref, { notified: true });
+                    return;
+                }
 
+                const isInternalEmail = data.email && data.email.toLowerCase().endsWith("@careconnect.com");
                 if (isInternalEmail) {
                     console.log(`🚫 Skipping Sheets sync for internal user: ${data.email}`);
-                    // Still mark as notified so we don't process them again
                     await updateDoc(thirdPerson.ref, { notified: true });
                     return;
                 }
@@ -169,7 +195,7 @@
                             phone: data.phone,
                             clinicName: clinic,
                             tokenNumber: data.token,
-                            email: data.email
+                            email: data.email || "manual@entry.none"
                         })
                     });
 
@@ -194,7 +220,7 @@
             snapshot.forEach((docSnap) => {
                 const d = docSnap.data();
                 const li = document.createElement("li");
-                li.innerHTML = `<span><strong>Token #${d.token}</strong><br><small>${d.name} | ${d.phone || 'N/A'}</small></span> <button class="view-btn" onclick="window.viewPatientDetails('${d.uid}', false)">View History</button>`;
+                li.innerHTML = `<span><strong>Token #${d.token}</strong> ${d.source === 'manual' ? '<span style="font-size:10px; color:#e67e22;">[MANUAL]</span>' : ''}<br><small>${d.name} | ${d.phone || 'N/A'}</small></span> <button class="view-btn" onclick="window.viewPatientDetails('${d.uid}', false)">View History</button>`;
                 queueList.appendChild(li);
             });
             etaBox.textContent = allPatients.length > 0 ? `${allPatients.length * AVG_TIME} minutes` : "Queue Empty";
@@ -224,6 +250,19 @@
         const overlay = document.getElementById("modalOverlay");
         modal.innerHTML = "<h4>Loading Records...</h4>";
         overlay.style.display = "flex";
+
+        // Handle manual patients (they might not have a profile in 'users' collection)
+        if (patientId.startsWith("manual-")) {
+            modal.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2 style="margin:0;">Walk-in Patient</h2>
+                    <button onclick="closeModal()" style="border:none; background:none; font-size:24px; cursor:pointer;">&times;</button>
+                </div>
+                <hr><p>Manual entry: Detailed medical history not available for unregistered walk-ins.</p><hr>
+                ${isEditable ? `<p style="color:red; font-size:12px;">Save visit is disabled for unregistered patients.</p>` : ""}
+            `;
+            return;
+        }
 
         const docSnap = await getDoc(doc(db, "users", patientId));
         if (docSnap.exists()) {
@@ -268,12 +307,10 @@
     document.getElementById("resetBtn").onclick = async () => {
         const now = new Date();
         const hour = now.getHours();
-
         if (hour < 17) {
             alert("⚠️ Restriction: Tokens can only be reset for the next day after 5:00 PM.");
             return;
         }
-
         const clinic = clinicSelect.value;
         if (!clinic) return;
         if (confirm("Reset token numbering to #1? Current waiting queue will stay.")) {
@@ -281,6 +318,57 @@
                 await setDoc(doc(db, "clinic_status", clinic), { currentlyServing: 0, lastTokenIssued: 0 }, { merge: true });
                 alert("✅ Success: New patients will start from Token #1.");
             } catch (error) { alert("Reset Failed: " + error.message); }
+        }
+    };
+
+    const addPatientBtn = document.getElementById("addPatientBtn");
+    addPatientBtn.onclick = () => {
+        document.getElementById("addPatientModalOverlay").style.display = "flex";
+    };
+
+    window.closeAddPatientModal = () => {
+        document.getElementById("addPatientModalOverlay").style.display = "none";
+        document.getElementById("patientName").value = "";
+        document.getElementById("patientPhone").value = "";
+    };
+
+    window.addPatientToQueue = async () => {
+        const name = document.getElementById("patientName").value.trim();
+        const phone = document.getElementById("patientPhone").value.trim();
+        const clinic = clinicSelect.value;
+
+        if (!name || !phone || !clinic) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        try {
+            const statusDoc = await getDoc(doc(db, "clinic_status", clinic));
+            let lastToken = 0;
+            if (statusDoc.exists()) {
+                lastToken = statusDoc.data().lastTokenIssued || 0;
+            }
+            const newToken = lastToken + 1;
+            const manualId = `manual-${Date.now()}`;
+
+            const patientData = {
+                name: name,
+                phone: phone,
+                token: newToken,
+                time: serverTimestamp(),
+                uid: manualId,
+                notified: false,
+                source: "manual" // 🏷️ ADDED TAG AS REQUESTED
+            };
+            
+            await setDoc(doc(queueRef, manualId), patientData);
+            await updateDoc(doc(db, "clinic_status", clinic), { lastTokenIssued: newToken });
+
+            alert(`Patient added with Token #${newToken}`);
+            closeAddPatientModal();
+        } catch (error) {
+            console.error("Error adding patient:", error);
+            alert("Failed to add patient. Please try again.");
         }
     };
 </script>

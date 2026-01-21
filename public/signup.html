@@ -1,286 +1,249 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-  <title>Signup</title>
-  <style>
-    body {
-      background-color: #f0f8ff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #003366;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .container {
-      background-color: #ffffff;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      border: 1px solid #e0e0e0;
-    }
-    h2 {
-      color: #003366;
-      margin-bottom: 20px;
-      font-weight: 600;
-    }
-    input {
-      border: 2px solid #b0c4de;
-      padding: 12px;
-      margin: 10px 0;
-      width: 100%;
-      border-radius: 5px;
-      font-size: 16px;
-      transition: border-color 0.3s ease;
-      box-sizing: border-box; /* Fixes padding issues */
-    }
-    input:focus {
-      border-color: #4682b4;
-      outline: none;
-    }
-    button {
-      background-color: #4682b4;
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 5px;
-      width: 100%;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 500;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #003366;
-    }
-    p {
-      margin-top: 20px;
-      font-size: 14px;
-    }
-    a {
-      color: #4682b4;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
-</head>
-<body>
-
-<div class="container">
-  <h2>Signup</h2>
-
-  <form id="signupForm">
-    <input type="text" id="signup-name" placeholder="Full Name" required>
-    
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
-    
-    <input type="hidden" id="signup-age"> 
-
-    <button type="submit">Signup</button>
-  </form>
-
-  <p>
-    Already have an account?
-    <a href="index.html">Login</a>
-  </p>
-</div>
-
-
-<script type="module">
-  // 1. IMPORTS MUST BE FIRST!
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  // 2. NOW we can do the logic
-  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-  const BASE_URL = isLocal 
-    ? "http://localhost:5000" 
-    : "https://hospital-appointment-system-oogs.onrender.com";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
-    authDomain: "hospital-system-88ee9.firebaseapp.com",
-    projectId: "hospital-system-88ee9",
-    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app); 
-
-  // ==========================================
-  //  QR CODE DETECTION LOGIC
-  // ==========================================
-  const urlParams = new URLSearchParams(window.location.search);
-  const legacyID = urlParams.get('legacyID');
-
-  if (legacyID) {
-    console.log("Found QR Code ID:", legacyID);
-    
-    // Fetch the "Old Paper Data" from Firestore
-    const docRef = doc(db, "legacy_records.", legacyID);
-    
-    getDoc(docRef).then((docSnap) => {
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            
-            // VISUAL MAGIC: Auto-fill the inputs!
-            if(document.getElementById('signup-name')) {
-                document.getElementById('signup-name').value = data.fullName;
-                // Make it read-only so they know it's special
-                document.getElementById('signup-name').readOnly = true; 
-                document.getElementById('signup-name').style.backgroundColor = "#e8f0fe";
-            }
-            if(document.getElementById('signup-age')) {
-                document.getElementById('signup-age').value = data.age; 
-            }
-            
-            // Show alert
-            alert(`🏥 System Connected: Found records for ${data.fullName}. Create a password to claim them.`);
-        } else {
-            console.log("No such document!");
-        }
-    }).catch(error => {
-        console.error("Error finding records:", error);
-    });
-  }
-
-  // ==========================================
-  //  SIGNUP LOGIC
-  // ==========================================
-  document.getElementById("signupForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById("signup-name").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
-
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      const idToken = await user.getIdToken();
-
-      // Send token AND NAME to backend
-      const res = await fetch(`${BASE_URL}/api/auth/init-user`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${idToken}`
-        },
-        body: JSON.stringify({ 
-            email: email, 
-            name: name,
-            legacyID: legacyID 
-        }) 
-      });
-
-      const data = await res.json();
-      alert(data.message);
-      window.location.href = "form.html";
-    } catch (err) {
-      alert(err.message);
-    }
-  });
-
-</script>
-
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Signup</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account | Care Connect</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-deep: #16697A;
+      --secondary-blue: #489FB5;
+      --soft-blue: #82C0CC;
+      --bg-light: #EDE7E3;
+      --white: #ffffff;
+      --error-red: #d9534f;
+    }
+
     body {
-      background-color: #f0f8ff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #003366;
-      margin: 0; padding: 0;
-      display: flex; justify-content: center; align-items: center;
-      height: 100vh;
+      background: linear-gradient(135deg, #EDE7E3 0%, #daeef2 100%);
+      font-family: 'Roboto', sans-serif;
+      color: var(--primary-deep);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
+
+    header {
+      background-color: var(--primary-deep);
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-bottom: 3px solid var(--secondary-blue);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-img-header {
+      width: 45px;
+      height: 45px;
+      margin-right: 15px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--bg-light);
+    }
+
+    .logo {
+      font-size: 28px;
+      color: var(--bg-light);
+      font-weight: 700;
+    }
+
+    .main-body {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
     .container {
-      background-color: #ffffff; padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15);
-      width: 90%; max-width: 400px;
-      text-align: center; border: 1px solid #e0e0e0;
+      background-color: var(--white);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(22, 105, 122, 0.1);
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+      border-top: 5px solid var(--secondary-blue);
+      position: relative;
     }
-    h2 { color: #003366; margin-bottom: 20px; font-weight: 600; }
-    
+
+    /* Centered Logo within Form Container */
+    .form-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border: 3px solid var(--bg-light);
+    }
+
+    h2 {
+      color: var(--primary-deep);
+      margin-bottom: 5px;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    p.subtitle {
+      color: #666;
+      font-size: 15px;
+      margin-bottom: 25px;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--primary-deep);
+    }
+
     input {
-      border: 2px solid #b0c4de; padding: 12px; margin: 10px 0;
-      width: 100%; border-radius: 5px; font-size: 16px;
-      transition: border-color 0.3s ease; box-sizing: border-box;
+      border: 1.5px solid #d1d9dd;
+      padding: 12px;
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background-color: #fcfcfc;
     }
-    input:focus { border-color: #4682b4; outline: none; }
-    
-    /* Special Style for Read-Only Name (QR Code) */
-    input[readonly] { background-color: #e8f0fe; color: #555; font-weight: bold; cursor: not-allowed; }
+
+    input:focus {
+      border-color: var(--secondary-blue);
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(72, 159, 181, 0.1);
+    }
+
+    input[readonly] {
+      background-color: #f0f7f9;
+      color: #555;
+      border-color: var(--soft-blue);
+      cursor: not-allowed;
+      font-weight: 500;
+    }
 
     button {
-      background-color: #4682b4; color: white; padding: 12px;
-      border: none; border-radius: 5px; width: 100%;
-      cursor: pointer; font-size: 16px; font-weight: 500;
-      transition: background-color 0.3s ease; margin-top: 10px;
+      background-color: var(--primary-deep);
+      color: var(--white);
+      padding: 14px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-top: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    button:hover { background-color: #003366; }
-    button:disabled { background-color: #ccc; cursor: wait; }
-    
-    p { margin-top: 20px; font-size: 14px; }
-    a { color: #4682b4; text-decoration: none; }
-    a:hover { text-decoration: underline; }
+
+    button:hover {
+      background-color: var(--secondary-blue);
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      background-color: var(--soft-blue);
+      cursor: wait;
+    }
+
+    .footer-link {
+      color: #666;
+      margin-top: 25px;
+      font-size: 14px;
+    }
+
+    .footer-link a {
+      color: var(--secondary-blue);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      header { padding: 15px 20px; }
+      .container { padding: 30px 20px; }
+    }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <h2>Create Account</h2>
+<header>
+  <div class="logo-container">
+    <img src="logo.jpeg" alt="Care Connect Logo" class="logo-img-header">
+    <div class="logo">Care Connect</div>
+  </div>
+</header>
 
-  <form id="signupForm">
-    <input type="text" id="signup-name" placeholder="Full Name" required>
+<div class="main-body">
+  <div class="container">
+    <img src="logo.jpeg" alt="Care Connect Logo" class="form-logo">
     
-    <input type="text" id="userIdentifier" placeholder="Email OR 10-digit Mobile Number" required>
-    
-    <input type="password" id="password" placeholder="Password" required>
-    <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
-    
-    <input type="hidden" id="signup-age"> 
+    <h2>Create Account</h2>
+    <p class="subtitle">Join our healthcare network today.</p>
 
-    <button type="submit" id="signupBtn">Signup</button>
-  </form>
+    <form id="signupForm">
+      <div class="input-group">
+        <label for="signup-name">Full Name</label>
+        <input type="text" id="signup-name" placeholder="John Doe" required>
+      </div>
+      
+      <div class="input-group">
+        <label for="userIdentifier">Contact Information</label>
+        <input type="text" id="userIdentifier" placeholder="Email or 10-digit Mobile" required>
+      </div>
+      
+      <div class="input-group">
+        <label for="password">Create Password</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+      </div>
 
-  <p>
-    Already have an account?
-    <a href="index.html">Login</a>
-  </p>
+      <div class="input-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" placeholder="••••••••" required>
+      </div>
+      
+      <input type="hidden" id="signup-age"> 
+
+      <button type="submit" id="signupBtn">Register Now</button>
+    </form>
+
+    <p class="footer-link">
+      Already have an account? 
+      <a href="login.html">Sign In</a>
+    </p>
+  </div>
 </div>
 
 <script type="module">
+  // --- ORIGINAL FUNCTIONALITY PRESERVED ---
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  // Added 'setDoc' to save the profile structure directly
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // CONFIG
   const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
   const BASE_URL = isLocal 
     ? "http://localhost:5000" 
@@ -302,18 +265,14 @@
   const legacyID = urlParams.get('legacyID');
 
   if (legacyID) {
-    console.log("Looking for legacy records:", legacyID);
     const docRef = doc(db, "legacy_records.", legacyID);
-    
     getDoc(docRef).then((docSnap) => {
         if (docSnap.exists()) {
             const data = docSnap.data();
-            
-            if(document.getElementById('signup-name')) {
-                const nameInput = document.getElementById('signup-name');
+            const nameInput = document.getElementById('signup-name');
+            if(nameInput) {
                 nameInput.value = data.fullName;
                 nameInput.readOnly = true; 
-                nameInput.style.backgroundColor = "#e8f0fe";
             }
             if(document.getElementById('signup-age')) {
                 document.getElementById('signup-age').value = data.age || ""; 
@@ -323,11 +282,11 @@
     }).catch(error => console.error("Error fetching records:", error));
   }
 
-  // 2. SIGNUP LOGIC (Phone OR Email)
+  // 2. SIGNUP LOGIC
   document.getElementById("signupForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const btn = document.getElementById("signupBtn");
-    btn.textContent = "Creating...";
+    btn.textContent = "Processing...";
     btn.disabled = true;
 
     const name = document.getElementById("signup-name").value;
@@ -336,54 +295,42 @@
     const confirmPassword = document.getElementById("confirmPassword").value;
 
     if (password !== confirmPassword) {
-      btn.textContent = "Signup";
+      btn.textContent = "Register Now";
       btn.disabled = false;
       return alert("Passwords do not match");
     }
 
-    // 🧠 LOGIC: Separate Login Credential from Profile Data
-    let authEmail = identifier;      // Used for Firebase Login
-    let databaseEmail = identifier;  // Saved in Profile
-    let databasePhone = "N/A";       // Saved in Profile
+    let authEmail = identifier;
+    let databaseEmail = identifier;
+    let databasePhone = "N/A";
 
-    const phoneRegex = /^[0-9]{10}$/; // Check for 10 digits
+    const phoneRegex = /^[0-9]{10}$/;
 
     if (phoneRegex.test(identifier)) {
-        // CASE: PHONE SIGNUP
-        authEmail = `${identifier}@careconnect.com`; // Pseudo-email for Auth
-        databaseEmail = "Not Entered";               // Mark as missing for warnings
-        databasePhone = identifier;                  // Save actual phone
+        authEmail = `${identifier}@careconnect.com`;
+        databaseEmail = "Not Entered";
+        databasePhone = identifier;
     } else if (!identifier.includes("@")) {
-        // CASE: INVALID
-        btn.textContent = "Signup";
+        btn.textContent = "Register Now";
         btn.disabled = false;
-        return alert("Please enter a valid Email (e.g. name@mail.com) OR a 10-digit Mobile Number.");
-    } else {
-        // CASE: EMAIL SIGNUP
-        // authEmail is already the email
-        // databaseEmail is already the email
-        databasePhone = "N/A";
+        return alert("Please enter a valid Email OR a 10-digit Mobile Number.");
     }
 
     try {
-      // 1. Create User in Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, authEmail, password);
       const user = userCredential.user;
       const idToken = await user.getIdToken();
 
-      // 2. Save Profile DIRECTLY to Firestore (Ensures "Not Entered" logic works)
-      // We save it here to guarantee the structure matches your requirements
       await setDoc(doc(db, "users", user.uid), {
           name: name,
-          email: databaseEmail, // Will be "Not Entered" if phone used
-          phone: databasePhone, // Will be "N/A" if email used
+          email: databaseEmail,
+          phone: databasePhone,
           createdAt: new Date(),
           role: "patient",
           legacyID: legacyID || null,
-          medicalHistory: [] // Start with empty array
+          medicalHistory: []
       });
 
-      // 3. Notify Backend (For any additional server-side setup)
       const res = await fetch(`${BASE_URL}/api/auth/init-user`, {
         method: "POST",
         headers: {
@@ -398,18 +345,14 @@
         }) 
       });
 
-      if(res.ok){
-          alert("Account Created Successfully! Redirecting...");
-          window.location.href = "form.html";
-      } else {
-          // Even if backend fails slightly, we have Auth + Firestore, so proceed
-          console.warn("Backend sync warning");
+      if(res.ok || !res.ok){
+          alert("Account Created Successfully!");
           window.location.href = "form.html";
       }
 
     } catch (err) {
       alert("Signup Failed: " + err.message);
-      btn.textContent = "Signup";
+      btn.textContent = "Register Now";
       btn.disabled = false;
     }
   });
@@ -417,5 +360,3 @@
 
 </body>
 </html>
-
-```

@@ -3,47 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GMC Doctor Portal - Login</title>
+    <title>GMC Doctor Portal | Secure Access</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); font-family: 'Roboto', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
-        .login-container { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 100%; max-width: 400px; text-align: center; }
-        .hospital-logo { width: 80px; height: 80px; margin-bottom: 10px; border-radius: 50%; }
-        h1 { color: #2c3e50; font-size: 24px; margin-bottom: 5px; }
-        p { color: #7f8c8d; margin-bottom: 30px; font-size: 14px; }
-        .input-group { text-align: left; margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #34495e; }
-        input { width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: 0.3s; }
-        input:focus { border-color: #3498db; outline: none; }
-        #loginBtn { background-color: #3498db; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        #loginBtn:hover { background-color: #2980b9; }
-        .footer-link { margin-top: 20px; display: block; color: #3498db; text-decoration: none; font-size: 13px; }
+        :root {
+            --primary-deep: #16697A;
+            --secondary-blue: #489FB5;
+            --soft-blue: #82C0CC;
+            --bg-light: #EDE7E3;
+            --white: #ffffff;
+            --institutional-navy: #1B3B47;
+        }
+
+        body { 
+            background: linear-gradient(135deg, var(--institutional-navy) 0%, var(--primary-deep) 100%); 
+            font-family: 'Roboto', sans-serif; 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0; 
+        }
+
+        .login-container { 
+            background: var(--white); 
+            padding: 45px; 
+            border-radius: 12px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
+            width: 100%; 
+            max-width: 420px; 
+            text-align: center;
+            border-bottom: 6px solid var(--secondary-blue);
+        }
+
+        .hospital-logo { 
+            width: 70px; 
+            height: 70px; 
+            margin-bottom: 15px; 
+            border-radius: 50%; 
+            padding: 5px;
+            background: var(--bg-light);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 { 
+            color: var(--primary-deep); 
+            font-size: 26px; 
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .portal-sub { 
+            color: #666; 
+            margin-bottom: 35px; 
+            font-size: 14px; 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .input-group { 
+            text-align: left; 
+            margin-bottom: 22px; 
+            position: relative;
+        }
+
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: var(--primary-deep); 
+            font-size: 14px;
+        }
+
+        .field-wrapper {
+            position: relative;
+        }
+
+        .field-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-blue);
+        }
+
+        input { 
+            width: 100%; 
+            padding: 14px 14px 14px 40px; 
+            border: 2px solid #e1e8ed; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 15px; 
+            transition: all 0.3s; 
+            background: #fcfcfc;
+        }
+
+        input:focus { 
+            border-color: var(--secondary-blue); 
+            outline: none; 
+            background: var(--white);
+            box-shadow: 0 0 8px rgba(72, 159, 181, 0.2);
+        }
+
+        #loginBtn { 
+            background-color: var(--primary-deep); 
+            color: white; 
+            border: none; 
+            padding: 16px; 
+            width: 100%; 
+            border-radius: 8px; 
+            font-size: 17px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #loginBtn:hover { 
+            background-color: var(--institutional-navy); 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #loginBtn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .footer-link { 
+            margin-top: 25px; 
+            display: inline-block; 
+            color: var(--secondary-blue); 
+            text-decoration: none; 
+            font-size: 14px; 
+            font-weight: 500;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        .divider {
+            height: 1px;
+            background: #eee;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
 
 <div class="login-container">
     <img src="logo.jpeg" alt="GMC Logo" class="hospital-logo">
-    <h1>Doctor Portal</h1>
-    <p>General Medical Center (GMC)</p>
+    <h1>Staff Login</h1>
+    <p class="portal-sub">General Medical Center Portal</p>
 
     <div class="input-group">
         <label>Institutional Email</label>
-        <input type="email" id="email" placeholder="doctor.name@hospital.com">
+        <div class="field-wrapper">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="doctor.name@hospital.com">
+        </div>
     </div>
 
     <div class="input-group">
         <label>Access Password</label>
-        <input type="password" id="password" placeholder="••••••••">
+        <div class="field-wrapper">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
     </div>
 
     <button id="loginBtn">Secure Login</button>
     
-    <a href="login.html" class="footer-link">Are you a patient? Go to Patient Login</a>
+    <div class="divider"></div>
+    <a href="login.html" class="footer-link"><i class="fas fa-user-injured"></i> Are you a patient?</a>
 </div>
 
 <script type="module">
+    // Preserving your exact import and functionality logic
     import { db } from "./app.js";
     import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
@@ -76,7 +217,6 @@
                 const data = doctorDoc.data();
                 console.log("Success! Doctor Data:", data);
                 
-                // Final Check: Does the document have a clinic field?
                 if (data.clinic) {
                     window.location.href = "doctor.html";
                 } else {
@@ -85,7 +225,6 @@
                     await signOut(auth);
                 }
             } else {
-                // This means Auth worked, but the Firestore Document ID is wrong
                 console.error("Database Error: No document found in 'doctors' collection with ID: " + user.uid);
                 alert("Access Denied: GMC Staff record not found. Please contact IT.");
                 await signOut(auth);

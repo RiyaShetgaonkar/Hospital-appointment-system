@@ -1,130 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | Care Connect</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
+    /* Professional Color Palette Integration */
+    :root {
+      --primary-deep: #16697A;
+      --secondary-blue: #489FB5;
+      --soft-blue: #82C0CC;
+      --bg-light: #EDE7E3;
+      --text-dark: #16697A;
+      --white: #ffffff;
+    }
+
     body {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
+      background: linear-gradient(135deg, #EDE7E3 0%, #daeef2 100%);
       font-family: 'Roboto', sans-serif;
-      color: #2c3e50;
+      color: var(--text-dark);
       margin: 0;
       padding: 0;
       height: 100vh;
       line-height: 1.6;
+      display: flex;
+      flex-direction: column;
     }
+
     header {
-      background-color: #ffffff;
-      padding: 20px 40px;
+      background-color: var(--primary-deep);
+      padding: 15px 40px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border-bottom: 3px solid #3498db;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-bottom: 3px solid var(--secondary-blue);
     }
+
     .logo-container {
       display: flex;
       align-items: center;
     }
-    .logo-img {
-      width: 50px;
-      height: 50px;
+
+    .logo-img-header {
+      width: 45px;
+      height: 45px;
       margin-right: 15px;
       border-radius: 50%;
       object-fit: cover;
+      border: 2px solid var(--bg-light);
     }
+
     .logo {
-      font-size: 32px;
-      color: #2c3e50;
-      font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
-      font-weight: 700;
-    }
-    .main-body {
-      padding: 60px 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .container {
-      background-color: #ffffff;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 500px;
-      text-align: center;
-      border: 1px solid #e1e8ed;
-      position: relative;
-      overflow: hidden;
-    }
-    .container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
-    }
-    h2 {
-      color: #2c3e50;
-      margin-bottom: 20px;
       font-size: 28px;
+      color: var(--bg-light);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .main-body {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: var(--white);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(22, 105, 122, 0.1);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      border-top: 5px solid var(--secondary-blue);
+      position: relative;
+    }
+
+    /* Centered Logo within Form Container */
+    .form-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border: 3px solid var(--bg-light);
+    }
+
+    h2 {
+      color: var(--primary-deep);
+      margin-bottom: 5px;
+      font-size: 26px;
       font-weight: 700;
     }
-    /* CHANGED: Removed type=email specificity to allow text input styling */
+
+    p.subtitle {
+      color: #666;
+      font-size: 15px;
+      margin-bottom: 30px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--primary-deep);
+    }
+
     input {
-      border: 2px solid #b0c4de;
-      padding: 12px;
-      margin: 10px 0;
+      border: 1.5px solid #d1d9dd;
+      padding: 14px;
       width: 100%;
       box-sizing: border-box;
       border-radius: 8px;
       font-size: 16px;
-      transition: border-color 0.3s ease;
+      transition: all 0.3s ease;
+      background-color: #fcfcfc;
     }
+
     input:focus {
-      border-color: #3498db;
+      border-color: var(--secondary-blue);
       outline: none;
-      box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+      background-color: var(--white);
+      box-shadow: 0 0 0 4px rgba(72, 159, 181, 0.1);
     }
+
     button {
-      background-color: #3498db;
-      color: white;
-      padding: 12px 20px;
+      background-color: var(--primary-deep);
+      color: var(--white);
+      padding: 14px 20px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
       width: 100%;
+      font-weight: 600;
+      transition: all 0.3s ease;
       margin-top: 10px;
-      font-weight: 500;
-      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 6px rgba(22, 105, 122, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
+
     button:hover {
-      background-color: #2980b9;
+      background-color: var(--secondary-blue);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(22, 105, 122, 0.2);
     }
+
+    button:active {
+      transform: translateY(0);
+    }
+
     button:disabled {
-      background-color: #bdc3c7;
+      background-color: var(--soft-blue);
       cursor: not-allowed;
+      opacity: 0.7;
     }
-    p {
-      color: #2c3e50;
-      margin-top: 20px;
+
+    .footer-link {
+      color: #666;
+      margin-top: 25px;
       font-size: 14px;
     }
-    a {
-      color: #3498db;
+
+    .footer-link a {
+      color: var(--secondary-blue);
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
     }
-    a:hover {
+
+    .footer-link a:hover {
       text-decoration: underline;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .container {
+        padding: 30px 20px;
+      }
+      header {
+        padding: 15px 20px;
+      }
     }
   </style>
 </head>
@@ -132,27 +201,39 @@
 
 <header>
   <div class="logo-container">
-    <img src="logo.jpeg" alt="Care Connect Logo" class="logo-img">
+    <img src="logo.jpeg" alt="Care Connect Logo" class="logo-img-header">
     <div class="logo">Care Connect</div>
   </div>
 </header>
 
 <div class="main-body">
   <div class="container">
+    <img src="logo.jpeg" alt="Care Connect Logo" class="form-logo">
+    
     <h2>Patient Login</h2>
+    <p class="subtitle">Welcome back! Please enter your details.</p>
+    
     <form id="loginForm">
-      <input type="text" id="login-identifier" placeholder="Email or Mobile Number" required><br><br>
+      <div class="input-group">
+        <label for="login-identifier">Email or Mobile</label>
+        <input type="text" id="login-identifier" placeholder="e.g. 9876543210" required>
+      </div>
       
-      <input type="password" id="password" placeholder="Password" required><br><br>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+      </div>
       
-      <button type="submit" id="loginBtn">Login</button>
+      <button type="submit" id="loginBtn">Sign In</button>
     </form>
-    <p>Don't have an account? <a href="signup.html">Signup</a></p>
+    
+    <p class="footer-link">Don't have an account? <a href="signup.html">Create one</a></p>
   </div>
 </div>
 
 <script type="module">
-  // AUTOMATICALLY DETECT ENVIRONMENT
+  // --- ORIGINAL SCRIPT LOGIC PRESERVED ---
+  
   const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 
   const BASE_URL = isLocal 
@@ -182,31 +263,25 @@
     btn.textContent = "Verifying...";
     btn.disabled = true;
 
-    // 🧠 SMART LOGIN LOGIC: Phone vs Email
     let finalEmail = identifier;
-    const phoneRegex = /^[0-9]{10}$/; // Checks for exactly 10 digits
+    const phoneRegex = /^[0-9]{10}$/; 
     
     if (phoneRegex.test(identifier)) {
-        // CASE: User typed a mobile number -> Add pseudo-domain
         finalEmail = `${identifier}@careconnect.com`;
     } 
     else if (!identifier.includes("@")) {
-        // CASE: Invalid input
         alert("Please enter a valid Email or a 10-digit Mobile Number.");
-        btn.textContent = "Login";
+        btn.textContent = "Sign In";
         btn.disabled = false;
         return;
     }
 
     try {
-      // 1. Authenticate with Firebase
       const userCredential = await signInWithEmailAndPassword(auth, finalEmail, password);
       const user = userCredential.user;
 
-      // 2. Get ID token
       const token = await user.getIdToken();
       
-      // 3. Initialize user & Check Role via Backend
       const response = await fetch(`${BASE_URL}/api/auth/init-user`, {
           method: "POST",
           headers: { 
@@ -216,13 +291,12 @@
           body: JSON.stringify({ name: user.displayName || "Patient" }) 
       });
 
-      // 🛑 HANDLE DOCTOR BLOCK (403 Forbidden)
       if (response.status === 403) {
           const data = await response.json();
-          alert(data.message); // Shows specific message: "Access Denied: Dr. Mehta..."
-          await signOut(auth);  // Sign out locally so they aren't "half-logged in"
+          alert(data.message); 
+          await signOut(auth);  
           
-          btn.textContent = "Login";
+          btn.textContent = "Sign In";
           btn.disabled = false;
           return;
       }
@@ -231,7 +305,6 @@
           throw new Error("Account validation failed. Please try again.");
       }
 
-      // alert("Login successful!");
       window.location.href = "dashboard.html";
       
     } catch (error) {
@@ -240,7 +313,7 @@
       if(error.code === "auth/invalid-credential") msg = "Incorrect Mobile Number/Email or Password.";
       
       alert("Login failed: " + msg);
-      btn.textContent = "Login";
+      btn.textContent = "Sign In";
       btn.disabled = false;
     }
   });

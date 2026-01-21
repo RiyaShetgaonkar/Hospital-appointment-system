@@ -1,9 +1,3 @@
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,7 +26,7 @@
         #submit:disabled { background-color: #bdc3c7; cursor: not-allowed; }
         #currentTokenBox { font-size: 16px; color: #2c3e50; font-weight: 500; margin: 20px 0; padding: 15px; border: 2px solid #3498db; border-radius: 8px; background-color: #f0faff; }
         .time-warning { color: #d35400; font-weight: bold; font-size: 14px; margin-bottom: 10px; display: none; background: #fff3e0; padding: 10px; border-radius: 8px; }
-        #cancelBtn { background-color: #e74c3c; display: none; }
+        #cancelBtn { background-color: #e74c3c; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; display: none; width: 100%; }
         #cancelBtn:hover { background-color: #c0392b; }
     </style>
 </head>
@@ -68,21 +62,18 @@
         <h3>Your Live Token Status</h3>
         <div id="currentTokenBox">Searching for active tokens...</div>
 
+        <button id="cancelBtn">Cancel Token</button>
+
         <div style="margin-top: 20px;">
-            <button id="cancelBtn" class="back-button">Cancel Token</button>
             <a href="dashboard.html" class="back-button">Dashboard</a>
         </div>
     </div>
 </div>
 
 <script type="module">
-    
-    // AUTOMATICALLY DETECT ENVIRONMENT
-const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const BASE_URL = isLocal ? "http://localhost:5000" : "https://hospital-appointment-system-oogs.onrender.com";
 
-const BASE_URL = isLocal 
-    ? "http://localhost:5000"                              // If on laptop, use Local Backend
-    : "https://hospital-appointment-system-oogs.onrender.com"; // If on web, use Live Render Backend
     import { db, AVG_TIME } from "./app.js";
     import { collection, addDoc, getDoc, doc, setDoc, serverTimestamp, onSnapshot, query, where, getDocs, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -92,7 +83,6 @@ const BASE_URL = isLocal
     const submitBtn = document.getElementById("submit");
     const tokenBox = document.getElementById("tokenBox");
     const patientNameUI = document.getElementById("patientName");
-    const etaBox = document.getElementById("etaBox");
     const currentTokenBox = document.getElementById("currentTokenBox");
     const timeWarning = document.getElementById("timeWarning");
     const cancelBtn = document.getElementById("cancelBtn");
@@ -102,7 +92,6 @@ const BASE_URL = isLocal
     let queueUnsubscribe = null;
     let statusUnsubscribe = null;
     let activeTokens = {}; 
-    let currentPeopleAhead = null; // Used for the "2 people ahead" logic
 
     function isBookingAllowed(clinicName) {
         if (clinicName === "Dermatology") return true;
@@ -117,10 +106,10 @@ const BASE_URL = isLocal
         
         if (selectedClinic && activeTokens[selectedClinic]) {
             submitBtn.disabled = true;
-            submitBtn.textContent = "Token Taken for " + selectedClinic;
+            submitBtn.textContent = "Token Active";
             submitBtn.style.backgroundColor = "#bdc3c7";
             timeWarning.style.display = "none";
-            cancelBtn.style.display = "inline-block";
+            cancelBtn.style.display = "block";
         } else if (selectedClinic && !allowedTime) {
             submitBtn.disabled = true;
             submitBtn.textContent = "Booking Closed";
@@ -156,20 +145,12 @@ const BASE_URL = isLocal
         if (statusUnsubscribe) statusUnsubscribe();
         
         if (!clinic) {
-            etaBox.textContent = "Select a clinic...";
             currentTokenBox.textContent = "Select a clinic to see status.";
             tokenBox.textContent = "—";
             refreshUI();
             return;
         }
 
-        // Real-time Queue Size
-        queueUnsubscribe = onSnapshot(collection(db, "queue", clinic, "patients"), (snapshot) => {
-            const count = snapshot.size;
-            etaBox.textContent = `Queue: ${count} patients (~${count * AVG_TIME} mins)`;
-        });
-
-        // 🔥 Rank-Based Listener (Handles the "Estimated Time Effect" of cancellations)
         const q = query(collection(db, "queue", clinic, "patients"), orderBy("time", "asc"));
         
         statusUnsubscribe = onSnapshot(q, (snapshot) => {
@@ -179,24 +160,20 @@ const BASE_URL = isLocal
             if (myIndex !== -1) {
                 const data = allPatients[myIndex].data();
                 activeTokens[clinic] = data.token;
-                currentPeopleAhead = myIndex; // 0 means you are next
-
-                const wait = currentPeopleAhead * AVG_TIME;
+                const wait = myIndex * AVG_TIME;
                 currentTokenBox.innerHTML = `
                     <div style="color: #3498db; font-weight: bold;">YOUR ${clinic.toUpperCase()} TOKEN</div>
                     <strong>Token:</strong> #${data.token}<br>
-                    <strong>Status:</strong> ${currentPeopleAhead === 0 ? "You're Next!" : currentPeopleAhead + " ahead"}<br>
-                    <span style="color: #27ae60;"><strong>Adjusted Wait:</strong> ~${wait} mins</span>
+                    <strong>Status:</strong> ${myIndex === 0 ? "You're Next!" : myIndex + " ahead"}<br>
+                    <span style="color: #27ae60;"><strong>Wait:</strong> ~${wait} mins</span>
                 `;
                 tokenBox.textContent = data.token;
-                refreshUI();
             } else {
                 delete activeTokens[clinic];
-                currentPeopleAhead = null;
                 currentTokenBox.textContent = `No active token for ${clinic}.`;
                 tokenBox.textContent = "—";
-                refreshUI();
             }
+            refreshUI();
         });
     };
 
@@ -225,35 +202,43 @@ const BASE_URL = isLocal
         } catch (e) { alert("Error: " + e.message); refreshUI(); }
     };
 
-    /* 🗑️ Smart Cancellation Logic */
+    /* 🗑️ Universal Cancellation & Token Release Logic */
     cancelBtn.onclick = async () => {
         const clinic = clinicSelect.value;
-        
-        // Block if less than 2 people are ahead (currentPeopleAhead is 0 or 1)
-        if (currentPeopleAhead !== null && currentPeopleAhead < 2) {
-            alert("Cancellation failed: You are already next in line or currently being called.");
-            return;
-        }
+        if (!clinic) return;
 
-        const confirmCancel = confirm(`You have ${currentPeopleAhead} people ahead. Are you sure you want to cancel? This will instantly move everyone behind you up in the queue.`);
-        
-        if (confirmCancel) {
+        if (confirm(`Are you sure you want to cancel Token #${activeTokens[clinic]}?`)) {
             cancelBtn.disabled = true;
             try {
-                const q = query(collection(db, "queue", clinic, "patients"), where("uid", "==", firebaseUser.uid));
+                // 1. Get full queue to check position
+                const q = query(collection(db, "queue", clinic, "patients"), orderBy("time", "asc"));
                 const snap = await getDocs(q);
-                if (!snap.empty) {
-                    await deleteDoc(snap.docs[0].ref);
-                    alert("Token cancelled. Wait times for other patients have been updated.");
+                const allDocs = snap.docs;
+                const myIndex = allDocs.findIndex(d => d.data().uid === firebaseUser.uid);
+
+                if (myIndex !== -1) {
+                    const myToken = allDocs[myIndex].data().token;
+                    const isLast = (myIndex === allDocs.length - 1);
+
+                    // 2. Delete the document
+                    await deleteDoc(allDocs[myIndex].ref);
+
+                    // 3. ♻️ Release Token if no one is behind
+                    if (isLast) {
+                        const statusRef = doc(db, "clinic_status", clinic);
+                        const statusSnap = await getDoc(statusRef);
+                        if (statusSnap.exists() && statusSnap.data().lastTokenIssued === myToken) {
+                            let releasedValue = myToken - 1;
+                            if (releasedValue < 0) releasedValue = 0;
+                            await setDoc(statusRef, { lastTokenIssued: releasedValue }, { merge: true });
+                        }
+                    }
+                    alert("Token cancelled successfully.");
                 }
             } catch (e) { alert("Error: " + e.message); }
             finally { cancelBtn.disabled = false; refreshUI(); }
         }
     };
-
-    setInterval(refreshUI, 60000); 
 </script>
 </body>
 </html>
-
-

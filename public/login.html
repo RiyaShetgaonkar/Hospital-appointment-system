@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Login</title>
+  <title>Login | Care Connect</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -134,7 +134,7 @@
 
 <div class="main-body">
   <div class="container">
-    <h2>Login</h2>
+    <h2>Patient Login</h2>
     <form id="loginForm">
       <input type="email" id="email" placeholder="Email" required><br><br>
       <input type="password" id="password" placeholder="Password" required><br><br>
@@ -146,14 +146,14 @@
 
 <script type="module">
   // AUTOMATICALLY DETECT ENVIRONMENT
-const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 
-const BASE_URL = isLocal 
-    ? "http://localhost:5000"                              // If on laptop, use Local Backend
-    : "https://hospital-appointment-system-oogs.onrender.com"; // If on web, use Live Render Backend
+  const BASE_URL = isLocal 
+      ? "http://localhost:5000" 
+      : "https://hospital-appointment-system-oogs.onrender.com";
+
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
+  import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
@@ -172,23 +172,40 @@ const BASE_URL = isLocal
     const password = document.getElementById("password").value;
 
     try {
-      // Authenticate with Firebase
+      // 1. Authenticate with Firebase
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Get token to notify our backend
+      // 2. Get ID token
       const token = await user.getIdToken();
       
-      // Initialize user in our Firestore via Node backend
-  await fetch(`${BASE_URL}/api/auth/init-user`, {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${token}` }
-});
+      // 3. Initialize user & Check Role via Backend
+      const response = await fetch(`${BASE_URL}/api/auth/init-user`, {
+          method: "POST",
+          headers: { 
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ name: user.displayName || "Patient" }) 
+      });
+
+      // 🛑 HANDLE DOCTOR BLOCK (403 Forbidden)
+      if (response.status === 403) {
+          const data = await response.json();
+          alert(data.message); // Shows specific message: "Access Denied: Dr. Mehta..."
+          await signOut(auth);  // Sign out locally so they aren't "half-logged in"
+          return;
+      }
+
+      if (!response.ok) {
+          throw new Error("Account validation failed. Please try again.");
+      }
 
       alert("Login successful!");
       window.location.href = "dashboard.html";
+      
     } catch (error) {
-      console.error(error);
+      console.error("Login Error:", error);
       alert("Login failed: " + error.message);
     }
   });

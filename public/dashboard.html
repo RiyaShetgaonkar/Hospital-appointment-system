@@ -671,7 +671,7 @@ const BASE_URL = isLocal
   document.getElementById('logoutBtn').addEventListener('click', async (e) => {
     e.preventDefault();
     await signOut(auth);
-    window.location.replace("index.html");
+    window.location.replace("login.html");
   });
 
   const profile = document.getElementById('profile');

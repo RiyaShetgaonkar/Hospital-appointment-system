@@ -11,18 +11,18 @@
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
-            color: #2c3e50;
+            background: linear-gradient(135deg, #EDE7E3 0%, #82C0CC 50%, #489FB5 100%);
+            color: #16697A;
             line-height: 1.6;
         }
         header {
-            background-color: #ffffff;
+            background-color: #16697A;
             padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-bottom: 3px solid #3498db;
+            border-bottom: 3px solid #489FB5;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -40,12 +40,12 @@
         }
         .logo {
             font-size: 32px;
-            color: #2c3e50;
+            color: #EDE7E3;
             font-weight: 700;
         }
         .auth-btn {
-            background-color: #3498db;
-            color: white;
+            background-color: #489FB5;
+            color: #EDE7E3;
             border: none;
             padding: 10px 20px;
             border-radius: 8px;
@@ -54,13 +54,14 @@
             transition: 0.3s;
         }
         .auth-btn:hover {
-            background-color: #2980b9;
+            background-color: #82C0CC;
         }
         .hero {
             text-align: center;
             padding: 100px 20px;
-            background: linear-gradient(135deg, #3498db 0%, #5dade2 50%, #85c1e9 100%);
-            color: white;
+            background: linear-gradient(135deg, #16697A 0%, #489FB5 50%, #82C0CC 100%);
+            color: #EDE7E3;
+            position: relative;
         }
         .hero h1 {
             font-size: 48px;
@@ -74,9 +75,17 @@
             margin-left: auto;
             margin-right: auto;
         }
+        .hero img {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
         .cta-btn {
-            background-color: #2ecc71;
-            color: white;
+            background-color: #FFA62B;
+            color: #16697A;
             border: none;
             padding: 15px 30px;
             border-radius: 8px;
@@ -85,18 +94,19 @@
             transition: 0.3s;
         }
         .cta-btn:hover {
-            background-color: #27ae60;
+            background-color: #EDE7E3;
         }
         .features {
             padding: 60px 20px;
             max-width: 1200px;
             margin: 0 auto;
+            background-color: #EDE7E3;
         }
         .features h2 {
             text-align: center;
             font-size: 36px;
             margin-bottom: 40px;
-            color: #2c3e50;
+            color: #16697A;
         }
         .feature-grid {
             display: grid;
@@ -104,29 +114,37 @@
             gap: 30px;
         }
         .feature-card {
-            background-color: #ffffff;
+            background-color: #82C0CC;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
-            border: 1px solid #e1e8ed;
+            border: 1px solid #489FB5;
+            position: relative;
+        }
+        .feature-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
         .feature-card i {
             font-size: 48px;
-            color: #3498db;
+            color: #16697A;
             margin-bottom: 20px;
         }
         .feature-card h3 {
             font-size: 24px;
             margin-bottom: 15px;
-            color: #2c3e50;
+            color: #16697A;
         }
         .feature-card p {
-            color: #666;
+            color: #16697A;
         }
         footer {
-            background-color: #2c3e50;
-            color: white;
+            background-color: #16697A;
+            color: #EDE7E3;
             text-align: center;
             padding: 20px;
             margin-top: 60px;
@@ -145,7 +163,7 @@
             align-items: center;
         }
         .modal-content {
-            background: white;
+            background: #EDE7E3;
             width: 90%;
             max-width: 400px;
             border-radius: 10px;
@@ -156,11 +174,11 @@
         }
         .modal-content h3 {
             margin-bottom: 20px;
-            color: #2c3e50;
+            color: #16697A;
         }
         .modal-btn {
-            background-color: #3498db;
-            color: white;
+            background-color: #489FB5;
+            color: #EDE7E3;
             border: none;
             padding: 12px 20px;
             border-radius: 8px;
@@ -171,7 +189,7 @@
             transition: 0.3s;
         }
         .modal-btn:hover {
-            background-color: #2980b9;
+            background-color: #82C0CC;
         }
         .close-btn {
             position: absolute;
@@ -181,10 +199,10 @@
             border: none;
             font-size: 24px;
             cursor: pointer;
-            color: #666;
+            color: #16697A;
         }
         .close-btn:hover {
-            color: #333;
+            color: #489FB5;
         }
         @media (max-width: 768px) {
             .hero h1 {
@@ -209,6 +227,7 @@
     </header>
 
     <section class="hero">
+        <img src="placeholder-hero.jpg" alt="Hero Image - Add your image here">
         <h1>Welcome to Care Connect</h1>
         <p>This website is a real-time hospital and clinic appointment management system designed to replace traditional physical queues with a digital token-based queue. Patients can book appointments online, receive a token, track their live position in the queue, view estimated waiting time, and cancel if needed. Doctors can monitor the live queue, call the next patient, view patient details and medical history, and manage the flow efficiently. The system uses real-time updates to ensure both patients and doctors always see the latest queue status, reducing waiting time, crowding, and improving overall clinic efficiency.</p>
         <button class="cta-btn" onclick="alert('Learn More or Get Started')">Get Started</button>
@@ -218,31 +237,37 @@
         <h2>Key Features</h2>
         <div class="feature-grid">
             <div class="feature-card">
+                <img src="placeholder-feature1.jpg" alt="Online Booking Image - Add your image here">
                 <i class="fas fa-calendar-check"></i>
                 <h3>Online Booking</h3>
                 <p>Patients can easily book appointments online and receive a unique digital token instantly.</p>
             </div>
             <div class="feature-card">
+                <img src="placeholder-feature2.jpg" alt="Live Queue Tracking Image - Add your image here">
                 <i class="fas fa-clock"></i>
                 <h3>Live Queue Tracking</h3>
                 <p>Track your position in the queue in real-time and view estimated waiting times.</p>
             </div>
             <div class="feature-card">
+                <img src="placeholder-feature3.jpg" alt="Doctor Dashboard Image - Add your image here">
                 <i class="fas fa-user-md"></i>
                 <h3>Doctor Dashboard</h3>
                 <p>Doctors can monitor the queue, call patients, and access medical histories seamlessly.</p>
             </div>
             <div class="feature-card">
+                <img src="placeholder-feature4.jpg" alt="Real-Time Updates Image - Add your image here">
                 <i class="fas fa-sync-alt"></i>
                 <h3>Real-Time Updates</h3>
                 <p>Instant notifications and updates ensure everyone stays informed without delays.</p>
             </div>
             <div class="feature-card">
+                <img src="placeholder-feature5.jpg" alt="Easy Cancellation Image - Add your image here">
                 <i class="fas fa-times-circle"></i>
                 <h3>Easy Cancellation</h3>
                 <p>Cancel appointments effortlessly if plans change, freeing up slots for others.</p>
             </div>
             <div class="feature-card">
+                <img src="placeholder-feature6.jpg" alt="Improved Efficiency Image - Add your image here">
                 <i class="fas fa-chart-line"></i>
                 <h3>Improved Efficiency</h3>
                 <p>Reduce crowding and waiting times, making clinics more efficient and patient-friendly.</p>

@@ -301,7 +301,7 @@
       <input type="date" id="dob" required>
       
       <label for="bloodGroup">Blood Group</label>
-      <input type="text" id="bloodGroup" required>
+      <input type="text" id="bloodGroup" placeholder="Leave empty to sync from QR" >
 
       <label>Phone Number</label>
       <input type="text" id="phone" required> 
@@ -327,8 +327,264 @@
     <a href="viewdetails.html" class="back-link">Cancel</a>
   </div>
 </div>
+<!-- <script type="module">
+  // 1. ENVIRONMENT CONFIG
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BASE_URL = isLocal ? "http://localhost:5000" : "https://hospital-appointment-system-oogs.onrender.com";
 
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
+    authDomain: "hospital-system-88ee9.firebaseapp.com",
+    projectId: "hospital-system-88ee9",
+    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // 2. ON LOAD: FILL DATA & CHECK QR CODE
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = "index.html"; return; }
+
+    document.getElementById("email").value = user.email;
+
+    // 🔥 CHECK FOR QR CODE
+    const urlParams = new URLSearchParams(window.location.search);
+    const legacyID = urlParams.get('legacyID');
+    
+    if (legacyID) {
+        console.log("🔗 QR DETECTED:", legacyID);
+        sessionStorage.setItem("pendingLegacyID", legacyID);
+        
+        // 🛑 AUTO-CLEAR BLOOD GROUP (This fixes the bug!)
+        const bgInput = document.getElementById("bloodGroup");
+        bgInput.value = ""; 
+        bgInput.placeholder = "Syncing from QR..."; 
+        bgInput.style.backgroundColor = "#e8f0fe"; // Light blue visual cue
+
+        alert(`Legacy Record Detected (${legacyID})!\n\nI have cleared the Blood Group box so it will sync automatically.\n\nClick 'Update Details' to finish.`);
+    }
+
+    // C. Fetch Existing Profile Data
+    try {
+        const token = await user.getIdToken();
+        const res = await fetch(`${BASE_URL}/api/auth/profile-data`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            
+            if (data.name) document.getElementById("name").value = data.name;
+            if (data.gender) document.getElementById("gender").value = data.gender;
+            if (data.dob) document.getElementById("dob").value = data.dob;
+            if (data.phone) document.getElementById("phone").value = data.phone;
+            if (data.taluka) document.getElementById("location").value = data.taluka;
+            
+            // Only fill Blood Group if we are NOT syncing a new one
+            if (!legacyID && data.bloodGroup) {
+                document.getElementById("bloodGroup").value = data.bloodGroup;
+            }
+            
+            const dbEmail = data.email || user.email;
+            document.getElementById("email").value = dbEmail;
+        }
+    } catch (err) {
+        console.error("Error fetching profile:", err);
+    }
+  });
+
+  // 3. ON SUBMIT: SEND DATA + LEGACY ID
+  document.getElementById("profileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("submitBtn");
+    btn.textContent = "Linking Records...";
+    btn.disabled = true;
+
+    try {
+      const user = auth.currentUser;
+      const token = await user.getIdToken();
+
+      // 🔥 RETRIEVE THE ID (From Session OR URL directly)
+      const urlParams = new URLSearchParams(window.location.search);
+      const legacyID = sessionStorage.getItem("pendingLegacyID") || urlParams.get('legacyID');
+
+      // 🛑 FINAL CHECK: Ensure Blood Group is EMPTY if we have a Legacy ID
+      if (legacyID) {
+          document.getElementById("bloodGroup").value = ""; 
+      }
+
+      let emailInput = document.getElementById("email").value.trim();
+      if(emailInput === "") emailInput = "Not Entered";
+
+      const profileData = {
+        name: document.getElementById("name").value,
+        gender: document.getElementById("gender").value,
+        dob: document.getElementById("dob").value,
+        bloodGroup: document.getElementById("bloodGroup").value, // Should be "" now
+        phone: document.getElementById("phone").value,
+        taluka: document.getElementById("location").value,
+        email: emailInput,
+        legacyID: legacyID 
+      };
+
+      console.log("📤 Sending Payload:", profileData); // Check your console for this!
+
+      const response = await fetch(`${BASE_URL}/api/auth/profile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(profileData)
+      });
+
+      if (response.ok) {
+        sessionStorage.removeItem("pendingLegacyID");
+        alert("Success! Records Linked.");
+        window.location.href = "dashboard.html";
+      } else {
+        const errText = await response.text();
+        alert("Update Failed: " + errText);
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      btn.textContent = "Update Details";
+      btn.disabled = false;
+    }
+  });
+</script> -->
 <script type="module">
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BASE_URL = isLocal ? "http://localhost:5000" : "https://hospital-appointment-system-oogs.onrender.com";
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
+    authDomain: "hospital-system-88ee9.firebaseapp.com",
+    projectId: "hospital-system-88ee9",
+    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = "index.html"; return; }
+
+    document.getElementById("email").value = user.email;
+    const token = await user.getIdToken();
+
+    // 🔥 1. CHECK FOR QR CODE
+    const urlParams = new URLSearchParams(window.location.search);
+    const legacyID = urlParams.get('legacyID');
+
+    if (legacyID) {
+        console.log("🔗 QR DETECTED. FETCHING DATA...", legacyID);
+        sessionStorage.setItem("pendingLegacyID", legacyID);
+        
+        // 🚀 CALL THE NEW PREVIEW API
+        try {
+            const previewRes = await fetch(`${BASE_URL}/api/auth/preview-legacy/${legacyID}`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            
+            if (previewRes.ok) {
+                const legacyData = await previewRes.json();
+                console.log("✅ Received Legacy Data:", legacyData);
+
+                // 🔥 AUTO-FILL THE BOXES IMMEDIATELY
+                if (legacyData.bloodGroup) {
+                    const bgInput = document.getElementById("bloodGroup");
+                    bgInput.value = legacyData.bloodGroup; // <--- FILLS IT HERE
+                    bgInput.style.border = "2px solid #2ecc71"; // Green border
+                    bgInput.style.backgroundColor = "#e8f8f5"; // Greenish background
+                }
+                
+                if (legacyData.name) {
+                    document.getElementById("name").value = legacyData.name;
+                }
+
+                alert(`Records Found!\n\nI have auto-filled your Blood Group (${legacyData.bloodGroup}) from the database.\n\nClick 'Save Details' to confirm.`);
+            }
+        } catch (err) {
+            console.error("Failed to preview:", err);
+        }
+    } 
+    // If NO QR code, load normal profile data
+    else {
+        loadUserProfile(user, token);
+    }
+  });
+
+  // Helper to load normal data (Only runs if NO QR code is present)
+  async function loadUserProfile(user, token) {
+      try {
+        const res = await fetch(`${BASE_URL}/api/auth/profile-data`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.name) document.getElementById("name").value = data.name;
+            if (data.bloodGroup) document.getElementById("bloodGroup").value = data.bloodGroup;
+            if (data.phone) document.getElementById("phone").value = data.phone;
+            // ... fill other fields
+        }
+      } catch (e) { console.error(e); }
+  }
+
+  // 3. SUBMIT FORM
+  document.getElementById("profileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.querySelector("button[type='submit']");
+    btn.textContent = "Saving...";
+    btn.disabled = true;
+
+    try {
+      const user = auth.currentUser;
+      const token = await user.getIdToken();
+      
+      const legacyID = sessionStorage.getItem("pendingLegacyID") || new URLSearchParams(window.location.search).get('legacyID');
+      
+      const profileData = {
+        name: document.getElementById("name").value,
+        gender: document.getElementById("gender").value,
+        dob: document.getElementById("dob").value,
+        bloodGroup: document.getElementById("bloodGroup").value,
+        phone: document.getElementById("phone").value,
+        taluka: document.getElementById("location").value,
+        email: document.getElementById("email").value || "Not Entered",
+        legacyID: legacyID 
+      };
+
+      const response = await fetch(`${BASE_URL}/api/auth/profile`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify(profileData)
+      });
+
+      if (response.ok) {
+        sessionStorage.removeItem("pendingLegacyID");
+        window.location.href = "dashboard.html";
+      } else {
+        alert("Error saving data.");
+      }
+    } catch (err) {
+      alert("Network Error");
+    } finally {
+      btn.textContent = "Save Details";
+      btn.disabled = false;
+    }
+  });
+</script>
+
+<!-- <script type="module">
   // AUTOMATICALLY DETECT ENVIRONMENT
   const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
   const BASE_URL = isLocal 
@@ -437,6 +693,6 @@
       btn.disabled = false;
     }
   });
-</script>
+</script> -->
 </body>
 </html>

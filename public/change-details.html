@@ -383,8 +383,8 @@ const BASE_URL = isLocal
       <label>Date of Birth</label>
       <input type="date" id="dob" required>
       
-      <label for="bloodGroup">Blood Group</label>
-      <input type="text" id="bloodGroup" required>
+    <label for="bloodGroup">Blood Group</label>
+<input type="text" id="bloodGroup" placeholder="Leave empty to sync from QR">
 
       <label>Phone Number</label>
       <input type="text" id="phone" readonly> <label>Taluka</label>
@@ -408,7 +408,7 @@ const BASE_URL = isLocal
     <a href="viewdetails.html" class="back-link">Cancel</a>
   </div>
 </div>
-
+<!-- 
 <script type="module">
   // AUTOMATICALLY DETECT ENVIRONMENT
   const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
@@ -514,6 +514,129 @@ const BASE_URL = isLocal
       alert("Network Error: " + err.message);
     } finally {
       btn.textContent = "Update Details";
+      btn.disabled = false;
+    }
+  });
+</script> -->
+
+<script type="module">
+  // 1. ENVIRONMENT CONFIG
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BASE_URL = isLocal ? "http://localhost:5000" : "https://hospital-appointment-system-oogs.onrender.com";
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDomNH7V0dxt_trHrUwghmUqd9eoUHxWYo",
+    authDomain: "hospital-system-88ee9.firebaseapp.com",
+    projectId: "hospital-system-88ee9",
+    appId: "1:1052835799972:web:81b5f73457d76b777ad731"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // 2. ON LOAD: FILL DATA & CHECK QR CODE
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = "index.html"; return; }
+
+    // A. Pre-fill Email
+    document.getElementById("email").value = user.email;
+
+    // 🔥 NEW: Check for Legacy ID in URL (QR Code Logic)
+    const urlParams = new URLSearchParams(window.location.search);
+    const legacyID = urlParams.get('legacyID');
+    
+    if (legacyID) {
+        console.log("🔗 Found Legacy ID:", legacyID);
+        // Save ID to session so we can send it later
+        sessionStorage.setItem("pendingLegacyID", legacyID);
+        alert("Legacy Record Detected! Click 'Update Details' to link your history.");
+    }
+
+    // C. Fetch Existing Profile Data (To avoid overwriting if user edits)
+    try {
+        const token = await user.getIdToken();
+        const res = await fetch(`${BASE_URL}/api/auth/profile-data`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            
+            if (data.name) document.getElementById("name").value = data.name;
+            if (data.gender) document.getElementById("gender").value = data.gender;
+            if (data.dob) document.getElementById("dob").value = data.dob;
+            if (data.bloodGroup) document.getElementById("bloodGroup").value = data.bloodGroup;
+            if (data.phone) document.getElementById("phone").value = data.phone;
+            if (data.taluka) document.getElementById("location").value = data.taluka;
+            
+            // Smart Email Check
+            const dbEmail = data.email || user.email;
+            document.getElementById("email").value = dbEmail;
+            
+            if(dbEmail === "Not Entered" || !dbEmail) {
+                 const note = document.getElementById("emailNote");
+                 if(note) note.style.display = "block";
+            }
+        }
+    } catch (err) {
+        console.error("Error fetching profile:", err);
+    }
+  });
+
+  // 3. ON SUBMIT: SEND DATA + LEGACY ID
+  document.getElementById("updateForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("submitBtn");
+    const originalText = btn.textContent;
+    btn.textContent = "Linking Records...";
+    btn.disabled = true;
+
+    try {
+      const user = auth.currentUser;
+      const token = await user.getIdToken();
+
+      // 🔥 RETRIEVE THE ID WE SAVED EARLIER
+      const legacyID = sessionStorage.getItem("pendingLegacyID");
+      
+      let emailInput = document.getElementById("email").value.trim();
+      if(emailInput === "") emailInput = "Not Entered";
+
+      const profileData = {
+        name: document.getElementById("name").value,
+        gender: document.getElementById("gender").value,
+        dob: document.getElementById("dob").value,
+        bloodGroup: document.getElementById("bloodGroup").value,
+        phone: document.getElementById("phone").value,
+        taluka: document.getElementById("location").value,
+        email: emailInput,
+        legacyID: legacyID // <--- THIS IS THE KEY PART!
+      };
+
+      const response = await fetch(`${BASE_URL}/api/auth/profile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(profileData)
+      });
+
+      if (response.ok) {
+        // Clear the ID so we don't link it twice
+        sessionStorage.removeItem("pendingLegacyID");
+        alert("Profile Updated & Records Linked Successfully!");
+        window.location.href = "dashboard.html";
+      } else {
+        const errText = await response.text();
+        alert("Update Failed: " + errText);
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      btn.textContent = originalText;
       btn.disabled = false;
     }
   });
